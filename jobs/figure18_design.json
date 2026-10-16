@@ -1,18 +1,24 @@
 {
   "version": 1,
-  "status": "implemented_pending_gpu_validation_allocation_rejected",
+  "status": "queued_regular_pending_gpu_validation",
   "execution": {
     "implementation_commit": "349a73e",
     "runner": "jobs/n2_count.sh",
     "reader": "analysis/paper_n2count.py",
     "preflight_runs": {"warmup": 1, "legacy_compatibility": 14, "matched_stream_input_check": 7},
     "local_checks": "count-control C++ tests, five analysis rejection tests, and 105 actual engine window-selection cases over seven circuits passed; new binary built; existing binary hashes unchanged",
-    "latest_request_utc": "2026-10-16T08:23:10Z",
+    "latest_request_utc": "2026-10-16T08:51:34Z",
+    "job_id": "59846258",
+    "qos": "regular",
+    "batch_script": "jobs/n2_count_batch.sh",
+    "submission_source_commit": "14aaa3da296bdb1c17c0b4ba0cce91d6b5c7ee68",
+    "submission_receipt": "logs/n2count/submission.59846258.json",
+    "scheduler_state_at_submission": "PENDING (Priority)",
     "allocation": null,
-    "submission_failure": "QOSMaxSubmitJobPerUserLimit; interactive MaxSubmitJobsPU=2, both occupied by non-pp_ jobs",
+    "previous_interactive_failure": "QOSMaxSubmitJobPerUserLimit; interactive MaxSubmitJobsPU=2, both occupied by non-pp_ jobs",
     "gpu_validation": "not_started",
     "pilot": "not_started",
-    "log": "logs/n2count/loop.log"
+    "log": "logs/n2count/batch-59846258.out"
   },
   "purpose": "Test whether online sector-count adaptation reduces end-to-end time relative to fixed granularity, including the fastest tested fixed setting for each workload.",
   "claim_boundary": "This isolates sector-count adaptation. It does not establish that eight-candidate competition is a major speedup or independently establish novelty.",
