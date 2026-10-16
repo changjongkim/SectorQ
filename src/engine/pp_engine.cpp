@@ -56,6 +56,7 @@
 #include <unistd.h>
 
 #include "circuit.hpp"
+#include "count_policy.hpp"
 
 extern "C" {
 void pp_owners16(const uint64_t* xz, int64_t n, int words, const uint64_t* masks, int g, uint16_t* owners);
@@ -119,6 +120,9 @@ struct Opts {
   double vramFrac = 0.9, expShare = 0.2;
   long target = 4000000;         // desired terms per bucket at the start of a window
   int gmax = 8, cands = 8, annMin = -1;
+  int fixedSectors = 0;          // experiment: constant requested count after common bootstrap
+  long policySeed = -1;          // -1 retains the legacy RNG; otherwise independent per-window streams
+  int policyAudit = 0;           // experiment: row hashes/ranks and count decisions, no extra MPI
   std::string window = "ann";    // ann | coset
   double kappa = 4.0;            // coset rule: the largest coset may hold 1/(kappa * buckets) of the sample
   long sample = 200000;
@@ -345,16 +349,19 @@ static Window planWindow(int b, int gWanted, const std::vector<uint64_t>& sample
   w.annDim = (int)ann.size();
   w.g = std::max(0, std::min(gWanted, w.annDim));
 
+  std::mt19937_64 matchedRng;
+  std::mt19937_64& rowRng = o.policySeed < 0 ? rng : matchedRng;
   auto randomRow = [&]() {
     BV r(W, 0);
     bool any = false;
     while (!any)
-      for (auto& a : ann) if (rng() & 1ULL) { any = true; for (int x = 0; x < W; x++) r[x] ^= a[x]; }
+      for (auto& a : ann) if (rowRng() & 1ULL) { any = true; for (int x = 0; x < W; x++) r[x] ^= a[x]; }
     return r;
   };
   const size_t ns = sample.size() / W;
   double bestMax = 1e300;
   for (int c = 0; c < (w.g && ns ? o.cands : 1); c++) {
+    if (o.policySeed >= 0) matchedRng.seed(policyStreamSeed(o.policySeed, b, (uint64_t)c));
     std::vector<uint64_t> rows((size_t)std::max(w.g, 1) * W, 0);
     for (int j = 0; j < w.g; j++) { BV r = randomRow(); std::copy(r.begin(), r.end(), rows.begin() + (size_t)j * W); }
     double mx = 0;
@@ -365,6 +372,7 @@ static Window planWindow(int b, int gWanted, const std::vector<uint64_t>& sample
     }
     if (mx < bestMax) { bestMax = mx; w.rows = rows; }
   }
+  if (o.policySeed >= 0) matchedRng.seed(policyStreamSeed(o.policySeed, b, 0x100000000ULL));
   if (!ann.empty()) for (int i = 0; i < 32; i++) w.spare.push_back(randomRow());
   if (o.fixedRows && g_fixed.empty() && w.g > 0) {
     // The rows for the rest of the run: as many as the largest bucket count, the best-balanced set on this sample.
@@ -1434,6 +1442,9 @@ int main(int argc, char** argv) {
     else if (a == "--target")      o.target = atol(next());
     else if (a == "--gmax")        o.gmax = atoi(next());
     else if (a == "--cands")       o.cands = atoi(next());
+    else if (a == "--fixed-sectors") o.fixedSectors = atoi(next());
+    else if (a == "--policy-seed") o.policySeed = atol(next());
+    else if (a == "--policy-audit") o.policyAudit = atoi(next());
     else if (a == "--ann-min")     o.annMin = atoi(next());
     else if (a == "--window")      o.window = next();
     else if (a == "--kappa")       o.kappa = atof(next());
@@ -1468,6 +1479,13 @@ int main(int argc, char** argv) {
   const bool ref = (o.mode == "ref");
   if (ref) { o.gpus = 1; o.gmax = 0; if (g_R > 1) die("reference mode runs on one node", __LINE__); }
   if (o.gmax > 12) die("--gmax is at most 12", __LINE__);
+  if (o.gmax < 0 || o.fixedSectors < 0 ||
+      (o.fixedSectors && ((o.fixedSectors & (o.fixedSectors - 1)) || o.fixedSectors > (1 << o.gmax))))
+    die("--fixed-sectors must be zero or a power of two within --gmax", __LINE__);
+  if (o.policySeed < -1) die("--policy-seed must be -1 or nonnegative", __LINE__);
+  if ((o.fixedSectors || o.policySeed >= 0) &&
+      (o.mode != "engine" || o.fixedRows || o.window != "ann" || !o.resume.empty() || o.pilot || o.stream))
+    die("count experiment requires engine/ann without fixed-rows, resume, pilot or stream", __LINE__);
   if (o.weight > 0) o.frame = 0;      // weight truncation needs the true strings
 
   Problem P = buildProblem(o);
@@ -1502,6 +1520,9 @@ int main(int argc, char** argv) {
            o.pinned ? "pinned chunks" : "pageable chunks");
     fflush(stdout);
   }
+  if (g_rank == 0 && (o.fixedSectors || o.policySeed >= 0 || o.policyAudit))
+    printf("count configuration: fixed_sectors=%d policy_seed=%ld bootstrap_workers=%d audit=%d\n",
+           o.fixedSectors, o.policySeed, o.gpus * g_R, o.policyAudit);
 
   Shared sh;
   std::mt19937_64 rng(o.seed);
@@ -1628,6 +1649,7 @@ int main(int argc, char** argv) {
   std::vector<uint64_t> noSample;
   if (!haveWindow) w = planShared(pos, 0, noSample, o, rng);   // the pool is one bucket at the start
   int prevBreaks = 0;                                          // --fixed-rows: the last window ended with a changed row
+  CountPolicy countPolicy(o.fixedSectors, o.gpus * g_R);
   for (int wi = firstWindow; ; wi++) {
     long NinLocal = 0, Nin = 0;
     for (auto& b : pool) NinLocal += b.n;
@@ -1687,6 +1709,7 @@ int main(int argc, char** argv) {
     // bit-changing operations of this window (branching is ignored for the estimate).
     Window nextW;
     int gWanted = 0;
+    int adaptiveWanted = 0;
     std::vector<uint64_t> sample;
     // With several GPUs the rows are chosen while the workers run this window: they need them only to partition
     // their output. The sample is taken before, while the terms are still in the pool.
@@ -1721,6 +1744,8 @@ int main(int argc, char** argv) {
         else
           while (gWanted < o.gmax && (1L << gWanted) < (long)g_R * o.earlyPerNode && est / (double)(2L << gWanted) >= (double)o.minBucketEarly) gWanted++;
       }
+      adaptiveWanted = gWanted;
+      gWanted = countPolicy.select(gWanted);
       pilotGrowth = -1;
       if (gWanted > 0) {
         const long stride = std::max<long>(1, Nin / std::max<long>(1, o.sample));   // o.sample terms over all nodes: every node sends its share
@@ -1808,6 +1833,19 @@ int main(int argc, char** argv) {
       }
     }
     if (Nin > 0 && Nout > 0) growth = std::max(1.0, std::min(o.growthCap, (double)Nout / (double)Nin * 1.3));
+    if (o.policyAudit && g_rank == 0) {
+      Span rowSpan; rowSpan.L = g_L;
+      uint64_t rowHash = 14695981039346656037ULL;
+      for (int j = 0; j < w.g; ++j) {
+        BV row(w.rows.begin() + (size_t)j * words, w.rows.begin() + (size_t)(j + 1) * words);
+        rowSpan.add(row);
+        for (uint64_t x : row) { rowHash ^= x; rowHash *= 1099511628211ULL; }
+      }
+      printf("count_policy window=%d rows=%d labels=%ld row_rank=%d row_hash=%016llx adaptive_next_rows=%d requested_next_rows=%d next_fixed_active=%d\n",
+             wi, w.g, 1L << w.g, rowSpan.dim(), (unsigned long long)rowHash,
+             last ? -1 : adaptiveWanted, last ? -1 : gWanted, countPolicy.active ? 1 : 0);
+      fflush(stdout);
+    }
     if (last) break;
     if (!o.stream) exchangeBuckets(sh.nextB, tExchange, bytesMoved);
     pool.swap(sh.nextB);
