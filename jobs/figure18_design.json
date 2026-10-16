@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "status": "design_only_not_submitted",
+  "purpose": "Test whether online sector-count adaptation reduces end-to-end time relative to fixed granularity, including the fastest tested fixed setting for each workload.",
+  "claim_boundary": "This isolates sector-count adaptation. It does not establish that eight-candidate competition is a major speedup or independently establish novelty.",
+  "source_evidence": {
+    "completed_campaign": "analysis/paper_n2.59842747.json",
+    "engine": "src/engine/pp_engine.cpp",
+    "count_selection_lines_at_design": [1705, 1722],
+    "gmax_is_a_cap_not_a_fixed_count": true,
+    "seed_also_changes_qaoa_and_hea_inputs": true,
+    "observed_KI_peak_nonempty_sectors_by_cutoff": {"1e-4": 16, "1e-5": 128, "3e-6": 256},
+    "existing_overlap_pairs_with_identical_row_count_sequences": 18
+  },
+  "controls": {
+    "nodes": 4,
+    "gpus": 16,
+    "gpus_per_node": 4,
+    "mpi_ranks_per_node": 1,
+    "circuit_seed": 7,
+    "window": "ann",
+    "frame": 1,
+    "trunc_every": 10,
+    "candidate_count": 8,
+    "overlap_plan": 1,
+    "maximum_sector_labels": 256,
+    "chunk_terms": 262144,
+    "vram_fraction": 0.9,
+    "target_terms_KI_and_noisy_KI": 6000000,
+    "target_terms_other_circuits": 4000000,
+    "circuit_arguments_source": "jobs/b_ablate.sh CIRC definitions",
+    "overflow_splitting": "Enabled identically in every policy; never disable the safety mechanism to make fixed-count controls fail.",
+    "same_binary_for_all_policies": true,
+    "new_binary_name": "pp_engine_n2count",
+    "preserve_existing_binaries": true
+  },
+  "policies": [
+    {"name": "adaptive", "count": "current live-count/growth/runtime feedback"},
+    {"name": "fixed16", "count": 16},
+    {"name": "fixed32", "count": 32},
+    {"name": "fixed64", "count": 64},
+    {"name": "fixed128", "count": 128},
+    {"name": "fixed256", "count": 256}
+  ],
+  "fixed_control_semantics": {
+    "rows_recomputed_each_window": true,
+    "candidate_scoring_retained": true,
+    "bootstrap": "Use the unchanged adaptive policy until it first requests at least 16 sector labels. From that decision onward request the specified constant number, including later shrinking windows. A workload that never triggers keeps the shared bootstrap, and is reported as no fixed-policy activation.",
+    "why_bootstrap": "Avoid penalizing fixed controls for dividing the initial single Pauli term into many empty labels.",
+    "limits": "Requested rows are capped by the actual annihilator dimension. Record requested labels, row rank, actual nonempty sectors, and emergency splits separately.",
+    "activation_audit": "Before activation all policies must have matching windows, rows and input counts for the same policy seed. Reject an unmatched block for causal comparison.",
+    "meaning_of_fixed": "Constant requested boundary sector count after shared bootstrap, with unchanged emergency splitting. This is not the existing fixed-rows ablation."
+  },
+  "required_implementation_before_execution": [
+    "Add a distinct fixed-sector-count control at gWanted selection; changing gmax or per-gpu is insufficient.",
+    "Decouple policy randomness from circuit seed. Use deterministic per-window and per-candidate random streams keyed by policy seed and window start, with a common candidate prefix and a separate spare-row stream.",
+    "Retain the existing RNG behavior as the default compatibility mode. The new matched-stream mode is experimental and must be explicit in all new comparisons.",
+    "Build a new binary manually, without the root build script and without replacing pp_engine_x or queued campaign binaries.",
+    "Record source commit, source diff if any, binary hash, full arguments, allocation, host list, policy seed and run order.",
+    "Verify the untouched default mode against pp_engine_x on all seven small-cutoff cases, checking answers, window boundaries and row-count traces. These are correctness/compatibility checks, not new performance results.",
+    "Verify fixed counts activate as specified and that all policies preserve window boundaries, truncation positions and answers. Record differences caused by unavoidable numerical effects rather than hiding them."
+  ],
+  "pilot": {
+    "circuits": ["ki", "tfim", "xxz"],
+    "selection_reason": "Predeclared representatives: standard KI, a different interaction graph, and the largest measured term population with stronger sector imbalance. All seven circuits remain in the confirmatory matrix.",
+    "cutoffs": ["1e-4", "3e-6"],
+    "policies": ["adaptive", "fixed16", "fixed32", "fixed64", "fixed128", "fixed256"],
+    "policy_seeds": [7],
+    "repetitions": 1,
+    "measured_runs": 36,
+    "maximum_allocations_before_review": 1,
+    "allocation_wall_hours": 4,
+    "not_for_confirmatory_speedup_claims": true,
+    "decision": "Audit count activation, correctness, total time, splits and phase timing. If the adaptive policy has no useful end-to-end benefit even against a fixed 16-label control, stop the large matrix and report the negative result. If it only beats an untuned constant, retain the per-workload best-fixed comparison and restrict the claim to tuning avoidance, subject to confirmatory results."
+  },
+  "confirmatory": {
+    "circuits": ["ki", "tfim", "noise", "tfimsq", "xxz", "qaoa", "hea"],
+    "cutoffs": ["1e-4", "1e-5", "3e-6"],
+    "policies": ["adaptive", "fixed16", "fixed32", "fixed64", "fixed128", "fixed256"],
+    "paired_block_policy_seeds": [11, 23, 37, 53, 71],
+    "repetitions_per_seed": 1,
+    "measured_runs": 630,
+    "uncertainty_scope": "Five paired blocks vary policy randomness and execution noise together; do not describe this as five timing repeats at one policy seed or cross-allocation robustness.",
+    "ordering": "For each circuit/cutoff/seed block, randomize the six policy executions with a logged schedule seed. Keep the full block on the same allocation and warm each node's GPU/library path before measurement.",
+    "pilot_reuse": false,
+    "controls_remeasured": true,
+    "allocation_wall_hours": 4,
+    "loops_per_allocation": 1,
+    "baseline_only_time_estimate_hours": 6.4602,
+    "time_estimate_caveat": "This is 775.22 seconds for the 21 existing adaptive runs times 6 policies times 5 blocks. It excludes warmup, launches and all static-policy slowdowns. Size the remaining campaign using the pilot, never promise completion in one allocation.",
+    "per_run_timeout_seconds": 1800,
+    "allocation_end_policy": "Do not begin a matched block unless its pilot-based budget fits with a cleanup reserve. Preserve partial blocks as incomplete and remeasure all six members together if a replacement block is needed. Do not combine a new control with an old allocation's variant."
+  },
+  "measurements": {
+    "primary": ["solver wall time", "successful completion", "expectation agreement"],
+    "secondary": ["actual sector labels and occupied sectors by window", "critical-path window time", "average worker idle seconds", "row-selection and exposed row-wait seconds", "GPU and host split counts", "library operation count", "host-device bytes and times", "inter-node bytes and exchange time", "peak chunk-pool allocation", "boundary terms"],
+    "instrumentation": "Use existing counters for the primary timing campaign. Add detailed diagnostic counters in a separate explicit trace mode, held identical for all variants. Avoid extra per-window collectives or per-sector logging in the primary timed path.",
+    "mechanism_checks": [
+      "If a coarse fixed count loses, check whether GPU/host splitting or worker idle actually increases.",
+      "If a fine fixed count loses, check whether tiny tasks, library calls or partition/copy costs actually increase.",
+      "If adaptive runtime falls without the proposed counters changing, report the observed effect without claiming that causal explanation.",
+      "Do not sum overlapping CPU and GPU counters as a wall-time decomposition."
+    ],
+    "answer_gate": "Require the existing absolute expectation tolerance of 1e-9, and matching prescribed truncation/window schedules. Treat violations as invalid, never as performance wins.",
+    "failure_reporting": "Keep OOM, timeout, invalid and unattempted runs distinct. Never assign an arbitrary large time or infinite speedup to them."
+  },
+  "analysis": {
+    "ordinary_reference": "Fixed 16 labels after shared bootstrap, corresponding to one nominal task per GPU.",
+    "strong_reference": "For each of the 21 workloads, the fastest tested fixed value among 16/32/64/128/256 according to its five-block mean. Disclose that this is a retrospective reference with workload-specific tuning, not a deployable oracle or a globally optimal fixed count.",
+    "ratios": "Mean reference wall time divided by mean adaptive wall time, within each workload. Report all 21 results, including slowdowns.",
+    "aggregate": "Equal-weight geometric mean across the 21 workloads, separately for fixed16 and best tested fixed. Also report each circuit and cutoff, win/loss counts and worst slowdown.",
+    "uncertainty": "Paired bootstrap over the five seed/run blocks, retaining the six policies jointly. For an aggregate interval, resample the same seed blocks jointly across all 21 workloads to preserve seed dependence. Re-select the best tested fixed policy within each bootstrap replicate. Report descriptive ranges as well as the interval and disclose the small sample count.",
+    "practical_claim_gate": "Use 10 percent as a predeclared practical aggregate target, with an interval lower bound above one. This is not a guarantee or a significance claim for every individual workload. Gains only against fixed16 do not support superiority over a tuned fixed policy.",
+    "if_small_or_negative": "Do not change the cutoff/seed suite to obtain wins. Keep this as parameter robustness or tuning-avoidance evidence if justified, and lower the standalone performance claim. Preserve the existing candidate-selection result."
+  },
+  "figure18": {
+    "a": "Small workload: cutoff 1e-4, all seven circuits, measured wall times for adaptive, fixed16, and each workload's best tested fixed setting.",
+    "b": "Medium workload: cutoff 1e-5, the same circuits and three comparisons.",
+    "c": "Large workload: cutoff 3e-6, the same circuits and three comparisons.",
+    "layout": "Three compact aligned panels with circuit categories, explicit Time (s) axes, five-block uncertainty and no inline data-value clutter. Identify the selected best-fixed count in supporting numeric data. All 630 measured outcomes remain auditable, including the fixed settings omitted from the main visual.",
+    "supporting_diagnostics": "Predeclare KI and XXZ at 3e-6 for per-window count/time/counter inspection. Use these traces to substantiate the mechanism, not as substitutes for end-to-end time.",
+    "old_data": "Retain the original 96-run candidate/overlap dataset. Existing overlap remains supporting evidence and is not relabeled as the new adaptation experiment.",
+    "paper_update_gate": "Replace the current Figure 18 only after valid measurements and analysis. Do not insert forecast speedups or change design figures."
+  }
+}
