@@ -69,6 +69,10 @@ def remaining_seconds(job):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('--batch', action='store_true', help='use this Slurm batch allocation; do not call salloc')
+    parser.add_argument('--source-commit')
+    parser.add_argument('--binary-sha256')
+    parser.add_argument('--reference-sha256')
     args = parser.parse_args()
     blocks = plan()
     if args.dry_run:
@@ -79,33 +83,52 @@ def main():
     BASE.mkdir(exist_ok=True)
     lock = (BASE / 'loop.lock').open('w')
     fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-    (BASE / 'loop.pid').write_text(str(os.getpid()) + '\n')
     job = None
+    interactive_owned = False
     directory = None
     binaries = {name: ROOT / 'bin' / name for name in ('pp_engine_x', 'pp_engine_n2count')}
     hashes = {name: digest(path) for name, path in binaries.items()}
-    source_commit = output(['git', 'rev-parse', 'HEAD'])
+    source_commit = args.source_commit or output(['git', 'rev-parse', 'HEAD'])
     clean_paths = ['src/engine/pp_engine.cpp', 'src/engine/count_policy.hpp',
-                   'jobs/n2_count.py', 'jobs/n2_count.sh', 'analysis/paper_n2count.py']
-    if output(['git', 'diff', 'HEAD', '--'] + clean_paths):
-        raise RuntimeError('commit experiment sources before launch')
+                   'src/engine/circuit.hpp', 'src/engine/gf2.hpp', 'src/engine/noise_fusion.hpp',
+                   'jobs/n2_count.py', 'jobs/n2_count.sh', 'jobs/n2_count_batch.sh', 'jobs/env.sh',
+                   'analysis/paper_n2count.py', 'analysis/paper_ablation.py']
+    if output(['git', 'diff', source_commit, '--'] + clean_paths):
+        raise RuntimeError('experiment sources differ from the submission commit')
+    if args.binary_sha256 and hashes['pp_engine_n2count'] != args.binary_sha256:
+        raise RuntimeError('experiment binary differs from the submitted hash')
+    if args.reference_sha256 and hashes['pp_engine_x'] != args.reference_sha256:
+        raise RuntimeError('reference binary differs from the submitted hash')
+    if args.batch and not all((args.source_commit, args.binary_sha256, args.reference_sha256)):
+        raise RuntimeError('batch execution requires pinned source and both binary hashes')
+    submitted_design = json.loads(output(['git', 'show', source_commit + ':jobs/figure18_design.json']))
+    current_design = json.loads((ROOT / 'jobs/figure18_design.json').read_text())
+    if submitted_design['pilot'] != current_design['pilot']:
+        raise RuntimeError('pilot matrix differs from the submission commit')
 
     def stop(signum, frame):
         raise RuntimeError('signal ' + str(signum))
     signal.signal(signal.SIGTERM, stop)
     signal.signal(signal.SIGINT, stop)
+    (BASE / 'loop.pid').write_text(str(os.getpid()) + '\n')
     try:
-        request = subprocess.run(['salloc', '--immediate=30', '-A', 'm5320_g', '-C', 'gpu&hbm40g',
-                                  '-q', 'interactive', '-N', '4', '-t', '04:00:00',
-                                  '--gpus-per-node=4', '--no-shell', '-J', 'pp_n2count'],
-                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                 universal_newlines=True, timeout=60)
-        say(request.stdout.strip())
-        match = re.search(r'Granted job allocation (\d+)', request.stdout)
-        if match:
-            job = match.group(1)
-        if request.returncode or not job:
-            raise RuntimeError('allocation request failed; no automatic retry')
+        if args.batch:
+            job = os.environ.get('SLURM_JOB_ID', '')
+            if not job.isdigit():
+                raise RuntimeError('--batch requires a numeric SLURM_JOB_ID')
+        else:
+            request = subprocess.run(['salloc', '--immediate=30', '-A', 'm5320_g', '-C', 'gpu&hbm40g',
+                                      '-q', 'interactive', '-N', '4', '-t', '04:00:00',
+                                      '--gpus-per-node=4', '--no-shell', '-J', 'pp_n2count'],
+                                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                     universal_newlines=True, timeout=60)
+            say(request.stdout.strip())
+            match = re.search(r'Granted job allocation (\d+)', request.stdout)
+            if match:
+                job = match.group(1)
+                interactive_owned = True
+            if request.returncode or not job:
+                raise RuntimeError('allocation request failed; no automatic retry')
         state = output(['squeue', '-h', '-j', job, '-o', '%j %T %D']).split()
         if state != ['pp_n2count', 'RUNNING', '4']:
             raise RuntimeError('unexpected allocation: ' + repr(state))
@@ -203,8 +226,9 @@ def main():
                 (ROOT / 'analysis' / ('paper_n2count.' + job + '.json')).write_text(json.dumps(result, indent=2) + '\n')
             except Exception as exc:
                 say('summary error: ' + repr(exc))
-        if job:
-            # This runner never attaches to another allocation. Only release its own named job.
+        if job and interactive_owned:
+            # Interactive allocations are explicitly released; batch exits release
+            # their allocation normally, preserving COMPLETED/FAILED accounting.
             try:
                 if output(['squeue', '-h', '-j', job, '-o', '%j']) == 'pp_n2count':
                     subprocess.run(['scancel', job], timeout=30, check=True)
