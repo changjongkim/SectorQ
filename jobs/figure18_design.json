@@ -1,6 +1,19 @@
 {
   "version": 1,
-  "status": "design_only_not_submitted",
+  "status": "implemented_pending_gpu_validation_allocation_rejected",
+  "execution": {
+    "implementation_commit": "349a73e",
+    "runner": "jobs/n2_count.sh",
+    "reader": "analysis/paper_n2count.py",
+    "preflight_runs": {"warmup": 1, "legacy_compatibility": 14, "matched_stream_input_check": 7},
+    "local_checks": "count-control C++ tests and five analysis rejection tests passed; new binary built; existing binary hashes unchanged",
+    "latest_request_utc": "2026-10-16T08:23:10Z",
+    "allocation": null,
+    "submission_failure": "QOSMaxSubmitJobPerUserLimit; interactive MaxSubmitJobsPU=2, both occupied by non-pp_ jobs",
+    "gpu_validation": "not_started",
+    "pilot": "not_started",
+    "log": "logs/n2count/loop.log"
+  },
   "purpose": "Test whether online sector-count adaptation reduces end-to-end time relative to fixed granularity, including the fastest tested fixed setting for each workload.",
   "claim_boundary": "This isolates sector-count adaptation. It does not establish that eight-candidate competition is a major speedup or independently establish novelty.",
   "source_evidence": {
