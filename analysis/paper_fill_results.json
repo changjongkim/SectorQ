@@ -1,0 +1,4079 @@
+{
+  "jobs": [
+    "59768854",
+    "59768995",
+    "59768996",
+    "59768998",
+    "59768999",
+    "59769000"
+  ],
+  "measurements": [
+    {
+      "job": "59768995",
+      "id": "monoprop.tfim.1e-4.n8",
+      "status": "ok",
+      "exit": 0,
+      "wall": 0.4643336699809879,
+      "expectation": 0.30250268595961016,
+      "log": "results/g_ext/monoprop.tfim.1e-4.n8.launch.json",
+      "time": "10-17T02:39:52",
+      "sha256": "62fd92722c6f6bab54efe6fe787080c6874ad99f1faa9d00ca859aba5f4f9e00",
+      "backend": "monoprop",
+      "circuit": "tfim",
+      "cutoff": 0.0001,
+      "nodes": 8,
+      "gpus_used": 0,
+      "truncation": "native"
+    },
+    {
+      "job": "59768995",
+      "id": "monoprop.tfim.3e-5.n8",
+      "status": "ok",
+      "exit": 0,
+      "wall": 3.079779961000895,
+      "expectation": 0.372135204694945,
+      "log": "results/g_ext/monoprop.tfim.3e-5.n8.launch.json",
+      "time": "10-17T02:40:02",
+      "sha256": "51c0410feb374859ef3fcdd7ba76219cf45d8242ea51e09f2a92c75feccb50fd",
+      "backend": "monoprop",
+      "circuit": "tfim",
+      "cutoff": 3e-05,
+      "nodes": 8,
+      "gpus_used": 0,
+      "truncation": "native"
+    },
+    {
+      "job": "59768854",
+      "id": "i.ref.ki.1e-6.g256",
+      "status": "ok",
+      "exit": 0,
+      "wall": 164.777,
+      "expectation": 0.321737584935,
+      "log": "logs/s/i.ref.ki.1e-6.g256.out",
+      "time": "10-17T02:41:10",
+      "sha256": "c27d9e15123c278ee9bca44f4696358b3e8544346e07fd4751c399de902c1f4f",
+      "backend": "sectorq",
+      "circuit": "ki",
+      "cutoff": 1e-06,
+      "nodes": 64,
+      "gpus_used": 256,
+      "truncation": "interval10",
+      "binary": "pp_engine_i",
+      "args": "--circuit ki_lab --weight 0 --coef 1e-6 --target 6000000 --trace 1 --vram-frac 0.9 --gpus 4",
+      "input": "window",
+      "boundary_terms": 11856171650,
+      "host_pool_gib": 1965.47,
+      "sector_cap": 256,
+      "chunk_terms": 262144
+    },
+    {
+      "job": "59768995",
+      "id": "monoprop.tfim.5e-6.n8",
+      "status": "ok",
+      "exit": 0,
+      "wall": 181.74495382097666,
+      "expectation": 0.47639384035382143,
+      "log": "results/g_ext/monoprop.tfim.5e-6.n8.launch.json",
+      "time": "10-17T02:43:10",
+      "sha256": "483481da8187cdbba126f71b0fb2dd0145008223594e376af813f34c33a0bca7",
+      "backend": "monoprop",
+      "circuit": "tfim",
+      "cutoff": 5e-06,
+      "nodes": 8,
+      "gpus_used": 0,
+      "truncation": "native"
+    },
+    {
+      "job": "59768995",
+      "id": "monoprop.tfim.3e-6.n8",
+      "status": "oom",
+      "exit": 1,
+      "wall": null,
+      "expectation": null,
+      "log": "results/g_ext/monoprop.tfim.3e-6.n8.launch.json",
+      "time": "10-17T02:46:22",
+      "sha256": "88dccfbf413c2382abb6a1f423d3f93cf01225fba032a81b74a5524871a9f05b",
+      "backend": "monoprop",
+      "circuit": "tfim",
+      "cutoff": 3e-06,
+      "nodes": 8,
+      "gpus_used": 0,
+      "truncation": "native",
+      "failure_evidence": "results/g_ext/monoprop.tfim.3e-6.n8.stderr.txt"
+    },
+    {
+      "job": "59768854",
+      "id": "r12.ki.5e-7.g256",
+      "status": "ok",
+      "exit": 0,
+      "wall": 321.932,
+      "expectation": 0.326511024867,
+      "log": "logs/s/r12.ki.5e-7.g256.out",
+      "time": "10-17T02:46:39",
+      "sha256": "d8329d7ab6ae744f88c9dc773073857d0f23c9d167af39f6910b1f23b1d85672",
+      "backend": "sectorq",
+      "circuit": "ki",
+      "cutoff": 5e-07,
+      "nodes": 64,
+      "gpus_used": 256,
+      "truncation": "interval10",
+      "binary": "pp_engine_i",
+      "args": "--circuit ki_lab --weight 0 --coef 5e-7 --target 6000000 --trace 1 --vram-frac 0.9 --gmax 12 --chunk 65536 --gpus 4",
+      "input": "window",
+      "boundary_terms": 44299331929,
+      "host_pool_gib": 3147.03,
+      "sector_cap": 4096,
+      "chunk_terms": 65536
+    },
+    {
+      "job": "59768995",
+      "id": "orqa.tfim.1e-4.n8",
+      "status": "ok",
+      "exit": 0,
+      "wall": 22.263350663,
+      "expectation": 0.3245476667663606,
+      "log": "results/g_ext/orqa.tfim.1e-4.n8.launch.json",
+      "time": "10-17T02:47:02",
+      "sha256": "005aa83d030eaf9d5cfde28e4c053e7a6ddb5552c40fecc25eb58f09a75e33f1",
+      "backend": "orqa",
+      "circuit": "tfim",
+      "cutoff": 0.0001,
+      "nodes": 8,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768995",
+      "id": "orqa.tfim.3e-5.n8",
+      "status": "ok",
+      "exit": 0,
+      "wall": 32.765458835,
+      "expectation": 0.37793853502243735,
+      "log": "results/g_ext/orqa.tfim.3e-5.n8.launch.json",
+      "time": "10-17T02:47:49",
+      "sha256": "c70f21c436e4e9129e0c6d59604324dbb4b9da808b0eec7de1c5c4ceb749ae81",
+      "backend": "orqa",
+      "circuit": "tfim",
+      "cutoff": 3e-05,
+      "nodes": 8,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768995",
+      "id": "orqa.tfim.5e-6.n8",
+      "status": "ok",
+      "exit": 0,
+      "wall": 507.01935906,
+      "expectation": 0.4842563488807078,
+      "log": "results/g_ext/orqa.tfim.5e-6.n8.launch.json",
+      "time": "10-17T02:56:30",
+      "sha256": "ff450253629acd4abaffe1a9fb11162e18f558ca5436c362100c793dc258a7b7",
+      "backend": "orqa",
+      "circuit": "tfim",
+      "cutoff": 5e-06,
+      "nodes": 8,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768995",
+      "id": "orqa.tfim.3e-6.n8",
+      "status": "oom",
+      "exit": 1,
+      "wall": null,
+      "expectation": null,
+      "log": "results/g_ext/orqa.tfim.3e-6.n8.launch.json",
+      "time": "10-17T03:00:29",
+      "sha256": "f1fd4246e1807d00a08ffefd4b77e391be2eff3856e0fdd3f31099ed67ac5db7",
+      "backend": "orqa",
+      "circuit": "tfim",
+      "cutoff": 3e-06,
+      "nodes": 8,
+      "gpus_used": 0,
+      "truncation": "matched",
+      "failure_evidence": "results/g_ext/orqa.tfim.3e-6.n8.stderr.txt"
+    },
+    {
+      "job": "59768995",
+      "id": "orqa.noise.1e-4.n8",
+      "status": "ok",
+      "exit": 0,
+      "wall": 23.880503525,
+      "expectation": 0.15611406582676043,
+      "log": "results/g_ext/orqa.noise.1e-4.n8.launch.json",
+      "time": "10-17T03:01:13",
+      "sha256": "2110e7f00a1d016d3d7d0ab45700567fb26956962591cb3586bfb9a0dc67d1aa",
+      "backend": "orqa",
+      "circuit": "noise",
+      "cutoff": 0.0001,
+      "nodes": 8,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768995",
+      "id": "orqa.noise.3e-5.n8",
+      "status": "ok",
+      "exit": 0,
+      "wall": 30.070980102,
+      "expectation": 0.1544199522463371,
+      "log": "results/g_ext/orqa.noise.3e-5.n8.launch.json",
+      "time": "10-17T03:01:57",
+      "sha256": "87cc7db24b43ea5062ebeec2ff90576f9d3b0a66e8f074f6a6abcd70e48f2fff",
+      "backend": "orqa",
+      "circuit": "noise",
+      "cutoff": 3e-05,
+      "nodes": 8,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768995",
+      "id": "orqa.noise.5e-6.n8",
+      "status": "ok",
+      "exit": 0,
+      "wall": 305.667170544,
+      "expectation": 0.18717154103533298,
+      "log": "results/g_ext/orqa.noise.5e-6.n8.launch.json",
+      "time": "10-17T03:07:18",
+      "sha256": "785459767e40c68549feb39e37e7833e4bd274b0d2fb716bef309ac0d67f5f87",
+      "backend": "orqa",
+      "circuit": "noise",
+      "cutoff": 5e-06,
+      "nodes": 8,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768995",
+      "id": "orqa.noise.3e-6.n8",
+      "status": "ok",
+      "exit": 0,
+      "wall": 777.701635632,
+      "expectation": 0.1976249403234658,
+      "log": "results/g_ext/orqa.noise.3e-6.n8.launch.json",
+      "time": "10-17T03:20:30",
+      "sha256": "53edbb7769982626e90eb3e058e9a9aa9aedfb9cedf5c4b45f33a8f78e13d7d8",
+      "backend": "orqa",
+      "circuit": "noise",
+      "cutoff": 3e-06,
+      "nodes": 8,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768995",
+      "id": "orqa.noise.2e-6.n8",
+      "status": "oom",
+      "exit": 1,
+      "wall": null,
+      "expectation": null,
+      "log": "results/g_ext/orqa.noise.2e-6.n8.launch.json",
+      "time": "10-17T03:23:47",
+      "sha256": "75f8bdb7ec7c9a728b728963bfabccf752fbb5050cc9f3a7b4058bf83932bef8",
+      "backend": "orqa",
+      "circuit": "noise",
+      "cutoff": 2e-06,
+      "nodes": 8,
+      "gpus_used": 0,
+      "truncation": "matched",
+      "failure_evidence": "results/g_ext/orqa.noise.2e-6.n8.stderr.txt"
+    },
+    {
+      "job": "59768854",
+      "id": "r12.ki.3e-7.g256",
+      "status": "ok",
+      "exit": 0,
+      "wall": 1229.386,
+      "expectation": 0.322615146919,
+      "log": "logs/s/r12.ki.3e-7.g256.out",
+      "time": "10-17T03:42:24",
+      "sha256": "21ad6febe46a3dbc664599df1db480b834d2fa59dc63711609145fb725b3a071",
+      "backend": "sectorq",
+      "circuit": "ki",
+      "cutoff": 3e-07,
+      "nodes": 64,
+      "gpus_used": 256,
+      "truncation": "interval10",
+      "binary": "pp_engine_i",
+      "args": "--circuit ki_lab --weight 0 --coef 3e-7 --target 6000000 --trace 1 --vram-frac 0.9 --gmax 12 --chunk 65536 --gpus 4",
+      "input": "window",
+      "boundary_terms": 117465018258,
+      "host_pool_gib": 6078.12,
+      "sector_cap": 4096,
+      "chunk_terms": 65536
+    },
+    {
+      "job": "59768854",
+      "id": "i.runtime12.tfim.3e-7.g256",
+      "status": "ok",
+      "exit": 0,
+      "wall": 1494.524,
+      "expectation": 0.607323241388,
+      "log": "logs/s/i.runtime12.tfim.3e-7.g256.out",
+      "time": "10-17T04:07:39",
+      "sha256": "10fcd1a2683d40a556b34c82b38996c3c75c897f9fdd101a29c8ffd8a94d4273",
+      "backend": "sectorq",
+      "circuit": "tfim",
+      "cutoff": 3e-07,
+      "nodes": 64,
+      "gpus_used": 256,
+      "truncation": "interval10",
+      "binary": "pp_engine_i",
+      "args": "--circuit tfim_hh --theta 0.2 --phi -0.3 --steps 20 --coef 3e-7 --target 4000000 --trace 1 --vram-frac 0.9 --gmax 12 --chunk 65536 --gpus 4",
+      "input": "window",
+      "boundary_terms": 212646465797,
+      "host_pool_gib": 9023.91,
+      "sector_cap": 4096,
+      "chunk_terms": 65536
+    },
+    {
+      "job": "59768854",
+      "id": "i.runtime12.noise.3e-7.g256",
+      "status": "ok",
+      "exit": 0,
+      "wall": 365.019,
+      "expectation": 0.224398619931,
+      "log": "logs/s/i.runtime12.noise.3e-7.g256.out",
+      "time": "10-17T04:13:56",
+      "sha256": "a82205bbedc9e62541001558d790a4a78edf51e373c861bacac4aca7e3bb059a",
+      "backend": "sectorq",
+      "circuit": "noise",
+      "cutoff": 3e-07,
+      "nodes": 64,
+      "gpus_used": 256,
+      "truncation": "interval10",
+      "binary": "pp_engine_i",
+      "args": "--circuit ki_noisy --noise 0.005 --coef 3e-7 --target 6000000 --trace 1 --vram-frac 0.9 --gmax 12 --chunk 65536 --gpus 4",
+      "input": "window",
+      "boundary_terms": 37315406185,
+      "host_pool_gib": 2981.68,
+      "sector_cap": 4096,
+      "chunk_terms": 65536
+    },
+    {
+      "job": "59768854",
+      "id": "i12.ki.2e-7.g256",
+      "status": "ok",
+      "exit": 0,
+      "wall": 3382.232,
+      "expectation": 0.315280156514,
+      "log": "logs/s/i12.ki.2e-7.g256.out",
+      "time": "10-17T05:10:44",
+      "sha256": "aca429e2ef0b0b6ade28bd6df6bce15a2f9ce4d6cfc3b1c11a795b0b1836edee",
+      "backend": "sectorq",
+      "circuit": "ki",
+      "cutoff": 2e-07,
+      "nodes": 64,
+      "gpus_used": 256,
+      "truncation": "interval10",
+      "binary": "pp_engine_i",
+      "args": "--circuit ki_lab --weight 0 --coef 2e-7 --target 6000000 --trace 1 --vram-frac 0.9 --gmax 12 --chunk 65536 --gpus 4",
+      "input": "window",
+      "boundary_terms": 257340956655,
+      "host_pool_gib": 11489.53,
+      "sector_cap": 4096,
+      "chunk_terms": 65536
+    },
+    {
+      "job": "59768854",
+      "id": "orqa.ki.1e-4.n64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 23.486706422,
+      "expectation": 0.1531081875912294,
+      "log": "results/g_ext/orqa.ki.1e-4.n64.launch.json",
+      "time": "10-17T05:11:25",
+      "sha256": "081d4f614e2ac6439019b164061b62476b791c69eb32b65946d27c24c8be57d6",
+      "backend": "orqa",
+      "circuit": "ki",
+      "cutoff": 0.0001,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768854",
+      "id": "orqa.ki.3e-5.n64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 22.564983933,
+      "expectation": 0.17400353818173572,
+      "log": "results/g_ext/orqa.ki.3e-5.n64.launch.json",
+      "time": "10-17T05:12:03",
+      "sha256": "ede858b4d6f1c9073354d0fb10a60337c0fbd28013e9664cd443fbff89515be8",
+      "backend": "orqa",
+      "circuit": "ki",
+      "cutoff": 3e-05,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768854",
+      "id": "orqa.ki.1e-5.n64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 38.658634557,
+      "expectation": 0.2286074414232851,
+      "log": "results/g_ext/orqa.ki.1e-5.n64.launch.json",
+      "time": "10-17T05:12:58",
+      "sha256": "4460e714e58bb28b853d4e177dba4b12e51a0fbc8072b596dc74bb7ca58995cf",
+      "backend": "orqa",
+      "circuit": "ki",
+      "cutoff": 1e-05,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768854",
+      "id": "orqa.ki.5e-6.n64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 89.563918116,
+      "expectation": 0.2653969126021494,
+      "log": "results/g_ext/orqa.ki.5e-6.n64.launch.json",
+      "time": "10-17T05:14:42",
+      "sha256": "f758161b5f8751ecfe3d926aca73d9fd0d1ec76819fb8789c0c6180969137cc3",
+      "backend": "orqa",
+      "circuit": "ki",
+      "cutoff": 5e-06,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768854",
+      "id": "orqa.ki.3e-6.n64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 208.437254346,
+      "expectation": 0.2892174706242761,
+      "log": "results/g_ext/orqa.ki.3e-6.n64.launch.json",
+      "time": "10-17T05:18:27",
+      "sha256": "fc02d1f9d6c2692228d18ddc5ae0c70343367b3b522ebfd079c909ca65504020",
+      "backend": "orqa",
+      "circuit": "ki",
+      "cutoff": 3e-06,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768854",
+      "id": "weakS.monoprop.ki.3.5e-6.g256",
+      "status": "ok",
+      "exit": 0,
+      "wall": 30.29557108899462,
+      "expectation": 0.28602679611674703,
+      "log": "results/g_ext/weakS.monoprop.ki.3.5e-6.g256.launch.json",
+      "time": "10-17T05:19:05",
+      "sha256": "c81aaad64af65461632d10000111c710d9ca7f0abe8c05ba7d0f8d5f9cd53f49",
+      "backend": "monoprop",
+      "circuit": "ki",
+      "cutoff": 3.5e-06,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "native"
+    },
+    {
+      "job": "59768854",
+      "id": "weakS.monoprop.tfim.3.5e-6.g256",
+      "status": "ok",
+      "exit": 0,
+      "wall": 45.632838960998924,
+      "expectation": 0.49308782721746214,
+      "log": "results/g_ext/weakS.monoprop.tfim.3.5e-6.g256.launch.json",
+      "time": "10-17T05:19:56",
+      "sha256": "7c95e504b1eafb2071c1327fbd87ff6acf813a555d0d8a3b4aa9ac139cd48d68",
+      "backend": "monoprop",
+      "circuit": "tfim",
+      "cutoff": 3.5e-06,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "native"
+    },
+    {
+      "job": "59768854",
+      "id": "weakS.orqa.ki.3.5e-6.g256",
+      "status": "ok",
+      "exit": 0,
+      "wall": 159.157435691,
+      "expectation": 0.2817925696685972,
+      "log": "results/g_ext/weakS.orqa.ki.3.5e-6.g256.launch.json",
+      "time": "10-17T05:22:50",
+      "sha256": "75994ec9d3ef2a1f6ccbfac2f1ca79e9e8018e9c5a22732099bcf19e12ad98c1",
+      "backend": "orqa",
+      "circuit": "ki",
+      "cutoff": 3.5e-06,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768854",
+      "id": "weakS.orqa.tfim.3.5e-6.g256",
+      "status": "ok",
+      "exit": 0,
+      "wall": 175.175570657,
+      "expectation": 0.50116635869252,
+      "log": "results/g_ext/weakS.orqa.tfim.3.5e-6.g256.launch.json",
+      "time": "10-17T05:26:01",
+      "sha256": "77fc66eac56213a90cc47ff1b6a623679ed741bcb55d2c6fc27f55eb9a7d7b2e",
+      "backend": "orqa",
+      "circuit": "tfim",
+      "cutoff": 3.5e-06,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768854",
+      "id": "weakS.orqa.noise.3.5e-6.g256",
+      "status": "ok",
+      "exit": 0,
+      "wall": 115.66488239,
+      "expectation": 0.194820633717118,
+      "log": "results/g_ext/weakS.orqa.noise.3.5e-6.g256.launch.json",
+      "time": "10-17T05:28:13",
+      "sha256": "3c63b98cdc8ada6409e4a93662c66a5523911daf86fe4cb4aca40a30280c8e6d",
+      "backend": "orqa",
+      "circuit": "noise",
+      "cutoff": 3.5e-06,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768854",
+      "id": "weakL.monoprop.ki.1.15e-6.g256",
+      "status": "oom",
+      "exit": 1,
+      "wall": null,
+      "expectation": null,
+      "log": "results/g_ext/weakL.monoprop.ki.1.15e-6.g256.launch.json",
+      "time": "10-17T05:31:57",
+      "sha256": "3e065ca997d0c319d41dbc28f265bf10ed521fff3d2031671ad70b96c230323b",
+      "backend": "monoprop",
+      "circuit": "ki",
+      "cutoff": 1.15e-06,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "native",
+      "failure_evidence": "results/g_ext/weakL.monoprop.ki.1.15e-6.g256.stderr.txt"
+    },
+    {
+      "job": "59768854",
+      "id": "weakL.monoprop.tfim.1.15e-6.g256",
+      "status": "ok",
+      "exit": 0,
+      "wall": 461.4970603999973,
+      "expectation": 0.54806156456024,
+      "log": "results/g_ext/weakL.monoprop.tfim.1.15e-6.g256.launch.json",
+      "time": "10-17T05:39:54",
+      "sha256": "0d1f881a5f252643cea6296f31c1f0d009b8a0c0c4d898cc2f9ce21fd55d21ad",
+      "backend": "monoprop",
+      "circuit": "tfim",
+      "cutoff": 1.15e-06,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "native"
+    },
+    {
+      "job": "59768854",
+      "id": "weakL.orqa.noise.1.15e-6.g256",
+      "status": "ok",
+      "exit": 0,
+      "wall": 640.695332253,
+      "expectation": 0.21383853343529163,
+      "log": "results/g_ext/weakL.orqa.noise.1.15e-6.g256.launch.json",
+      "time": "10-17T05:50:51",
+      "sha256": "274cfe6c63c3114785b266623debf6648e4ef9b937290d31bef078ee02e99fda",
+      "backend": "orqa",
+      "circuit": "noise",
+      "cutoff": 1.15e-06,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768854",
+      "id": "monoprop.ki.2e-6.n64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 97.1528335599869,
+      "expectation": 0.307293999400958,
+      "log": "results/g_ext/monoprop.ki.2e-6.n64.launch.json",
+      "time": "10-17T05:52:37",
+      "sha256": "dd62e44dcfbf5d56bbd6130e5352cd9b22fad0178db33dbf8429013db66949b0",
+      "backend": "monoprop",
+      "circuit": "ki",
+      "cutoff": 2e-06,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "native"
+    },
+    {
+      "job": "59768854",
+      "id": "monoprop.ki.1e-6.n64",
+      "status": "oom",
+      "exit": 1,
+      "wall": null,
+      "expectation": null,
+      "log": "results/g_ext/monoprop.ki.1e-6.n64.launch.json",
+      "time": "10-17T05:55:22",
+      "sha256": "72451b01db2ed1572e9085d311a9f6e4e6eeed1db581e8f467a259ef81c658ca",
+      "backend": "monoprop",
+      "circuit": "ki",
+      "cutoff": 1e-06,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "native",
+      "failure_evidence": "results/g_ext/monoprop.ki.1e-6.n64.stderr.txt"
+    },
+    {
+      "job": "59768854",
+      "id": "orqa.ki.2e-6.n64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 438.656773097,
+      "expectation": 0.30455328861763353,
+      "log": "results/g_ext/orqa.ki.2e-6.n64.launch.json",
+      "time": "10-17T06:03:09",
+      "sha256": "9f4bc7e31482806a524f383e224dd3a8203c38bd4afec2d401e83bfb2baa8e1f",
+      "backend": "orqa",
+      "circuit": "ki",
+      "cutoff": 2e-06,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768996",
+      "id": "i.ref.ki.1e-6.g64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 441.629,
+      "expectation": 0.321737584935,
+      "log": "logs/s/i.ref.ki.1e-6.g64.out",
+      "time": "10-18T09:47:50",
+      "sha256": "c3fd2300c39b1076eabad498b891e3f1d764241c704c1ddd69a10cfa13e06221",
+      "backend": "sectorq",
+      "circuit": "ki",
+      "cutoff": 1e-06,
+      "nodes": 16,
+      "gpus_used": 64,
+      "truncation": "interval10",
+      "binary": "pp_engine_i",
+      "args": "--circuit ki_lab --weight 0 --coef 1e-6 --target 6000000 --trace 1 --vram-frac 0.9 --gpus 4",
+      "input": "window",
+      "boundary_terms": 11856171650,
+      "host_pool_gib": 780.47,
+      "sector_cap": 256,
+      "chunk_terms": 262144
+    },
+    {
+      "job": "59768998",
+      "id": "weakL.orqa.noise.1.6e-6.g128",
+      "status": "ok",
+      "exit": 0,
+      "wall": 668.324384614,
+      "expectation": 0.20897685071620176,
+      "log": "results/g_ext/weakL.orqa.noise.1.6e-6.g128.retry1.launch.json",
+      "time": "10-18T09:52:03",
+      "sha256": "f46af2369428e67c557ca6b0d45db70e363ce063ff706d943a1da6bf4b655d68",
+      "backend": "orqa",
+      "circuit": "noise",
+      "cutoff": 1.6e-06,
+      "nodes": 32,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768998",
+      "id": "monoprop.tfim.1e-6.n32",
+      "status": "oom",
+      "exit": 1,
+      "wall": null,
+      "expectation": null,
+      "log": "results/g_ext/monoprop.tfim.1e-6.n32.launch.json",
+      "time": "10-18T09:54:34",
+      "sha256": "2d38a1347a38f8d48c9ef8b5e45ca2d2506a78e785df81ab43b44413ab707bf5",
+      "backend": "monoprop",
+      "circuit": "tfim",
+      "cutoff": 1e-06,
+      "nodes": 32,
+      "gpus_used": 0,
+      "truncation": "native",
+      "failure_evidence": "results/g_ext/monoprop.tfim.1e-6.n32.stderr.txt"
+    },
+    {
+      "job": "59768998",
+      "id": "orqa.tfim.2e-6.n32",
+      "status": "ok",
+      "exit": 0,
+      "wall": 860.093922444,
+      "expectation": 0.5303872348168165,
+      "log": "results/g_ext/orqa.tfim.2e-6.n32.launch.json",
+      "time": "10-18T10:09:36",
+      "sha256": "61b48558aee4ff521a11dccb304ad71e63dc38411ae015170494ad3236c1f5f2",
+      "backend": "orqa",
+      "circuit": "tfim",
+      "cutoff": 2e-06,
+      "nodes": 32,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768998",
+      "id": "orqa.noise.1e-4.n32",
+      "status": "ok",
+      "exit": 0,
+      "wall": 31.49391939,
+      "expectation": 0.15611406582676046,
+      "log": "results/g_ext/orqa.noise.1e-4.n32.launch.json",
+      "time": "10-18T10:10:23",
+      "sha256": "c41d9f0a29594abd4b9fc368659267813107f043d3337b79eb20140c0f56a608",
+      "backend": "orqa",
+      "circuit": "noise",
+      "cutoff": 0.0001,
+      "nodes": 32,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768998",
+      "id": "orqa.noise.3e-5.n32",
+      "status": "ok",
+      "exit": 0,
+      "wall": 34.345959866,
+      "expectation": 0.15441995224633717,
+      "log": "results/g_ext/orqa.noise.3e-5.n32.launch.json",
+      "time": "10-18T10:11:12",
+      "sha256": "ca031bb27fe220ae6af892dfafb33f7705b84e5241b2b6094fde30a9faa49d49",
+      "backend": "orqa",
+      "circuit": "noise",
+      "cutoff": 3e-05,
+      "nodes": 32,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768998",
+      "id": "orqa.noise.1e-5.n32",
+      "status": "ok",
+      "exit": 0,
+      "wall": 52.139686715,
+      "expectation": 0.17331882984088798,
+      "log": "results/g_ext/orqa.noise.1e-5.n32.launch.json",
+      "time": "10-18T10:12:18",
+      "sha256": "11bd2c0db4abb4b3f05d36422e7fa313c48fba12c54f25a472f2d67588cf4b9a",
+      "backend": "orqa",
+      "circuit": "noise",
+      "cutoff": 1e-05,
+      "nodes": 32,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768998",
+      "id": "orqa.noise.5e-6.n32",
+      "status": "ok",
+      "exit": 0,
+      "wall": 103.212011413,
+      "expectation": 0.18717154103533298,
+      "log": "results/g_ext/orqa.noise.5e-6.n32.launch.json",
+      "time": "10-18T10:14:17",
+      "sha256": "bb2e50626605f176662caa450ce337485fa2d5ca304891e190a4e03a943ab8a4",
+      "backend": "orqa",
+      "circuit": "noise",
+      "cutoff": 5e-06,
+      "nodes": 32,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768996",
+      "id": "i.runtime10.tfim.5e-7.g64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 1646.363,
+      "expectation": 0.588026299037,
+      "log": "logs/s/i.runtime10.tfim.5e-7.g64.out",
+      "time": "10-18T10:15:39",
+      "sha256": "6a7b085022aa75f6c9739b6fcb74be91b05b4dd28e1d564bf1146d9e45375733",
+      "backend": "sectorq",
+      "circuit": "tfim",
+      "cutoff": 5e-07,
+      "nodes": 16,
+      "gpus_used": 64,
+      "truncation": "interval10",
+      "binary": "pp_engine_i",
+      "args": "--circuit tfim_hh --theta 0.2 --phi -0.3 --steps 20 --coef 5e-7 --target 4000000 --trace 1 --vram-frac 0.9 --gmax 10 --gpus 4",
+      "input": "window",
+      "boundary_terms": 78475039332,
+      "host_pool_gib": 3196.56,
+      "sector_cap": 1024,
+      "chunk_terms": 262144
+    },
+    {
+      "job": "59768998",
+      "id": "orqa.noise.3e-6.n32",
+      "status": "ok",
+      "exit": 0,
+      "wall": 223.338058541,
+      "expectation": 0.19762494032346584,
+      "log": "results/g_ext/orqa.noise.3e-6.n32.launch.json",
+      "time": "10-18T10:18:15",
+      "sha256": "193724e8756ff6a9fe4c0241142e9d48eb102afb511344d94121a8e6282e7302",
+      "backend": "orqa",
+      "circuit": "noise",
+      "cutoff": 3e-06,
+      "nodes": 32,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768996",
+      "id": "i.runtime10.noise.5e-7.g64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 543.203,
+      "expectation": 0.222369823868,
+      "log": "logs/s/i.runtime10.noise.5e-7.g64.out",
+      "time": "10-18T10:24:49",
+      "sha256": "8236347685672b1a98c9dced44ae625785f4e38538873a7d8636109e0ffe3565",
+      "backend": "sectorq",
+      "circuit": "noise",
+      "cutoff": 5e-07,
+      "nodes": 16,
+      "gpus_used": 64,
+      "truncation": "interval10",
+      "binary": "pp_engine_i",
+      "args": "--circuit ki_noisy --noise 0.005 --coef 5e-7 --target 6000000 --trace 1 --vram-frac 0.9 --gmax 10 --gpus 4",
+      "input": "window",
+      "boundary_terms": 14882411543,
+      "host_pool_gib": 962.5,
+      "sector_cap": 1024,
+      "chunk_terms": 262144
+    },
+    {
+      "job": "59768996",
+      "id": "weakS.monoprop.tfim.7.1e-6.g64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 42.92861632001586,
+      "expectation": 0.4601541780202175,
+      "log": "results/g_ext/weakS.monoprop.tfim.7.1e-6.g64.launch.json",
+      "time": "10-18T10:25:39",
+      "sha256": "75df5a1359bdb897f972040657c3c44c61af4574a089853b50e9278f19063a71",
+      "backend": "monoprop",
+      "circuit": "tfim",
+      "cutoff": 7.1e-06,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "native"
+    },
+    {
+      "job": "59768998",
+      "id": "orqa.noise.2e-6.n32",
+      "status": "ok",
+      "exit": 0,
+      "wall": 450.607332921,
+      "expectation": 0.20524787751667076,
+      "log": "results/g_ext/orqa.noise.2e-6.n32.launch.json",
+      "time": "10-18T10:26:00",
+      "sha256": "b18e1beeac45e4ce539554f7e425d2c205b7b3f5dc3aa21391bc2c16b84fb72d",
+      "backend": "orqa",
+      "circuit": "noise",
+      "cutoff": 2e-06,
+      "nodes": 32,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768996",
+      "id": "weakS.orqa.ki.7.1e-6.g64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 143.695346442,
+      "expectation": 0.24731300744123458,
+      "log": "results/g_ext/weakS.orqa.ki.7.1e-6.g64.launch.json",
+      "time": "10-18T10:28:17",
+      "sha256": "a2aa6236c625a71cf926dbc25acad716e2326b19d1a6288ff9320734ec0368b1",
+      "backend": "orqa",
+      "circuit": "ki",
+      "cutoff": 7.1e-06,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768998",
+      "id": "orqa.noise.1e-6.n32",
+      "status": "oom",
+      "exit": 1,
+      "wall": null,
+      "expectation": null,
+      "log": "results/g_ext/orqa.noise.1e-6.n32.launch.json",
+      "time": "10-18T10:28:49",
+      "sha256": "55eb19b494b5c50758133d678381b1db7771780b6d808dea28d696aa2901cdf9",
+      "backend": "orqa",
+      "circuit": "noise",
+      "cutoff": 1e-06,
+      "nodes": 32,
+      "gpus_used": 0,
+      "truncation": "matched",
+      "failure_evidence": "results/g_ext/orqa.noise.1e-6.n32.stderr.txt"
+    },
+    {
+      "job": "59768996",
+      "id": "weakS.orqa.tfim.7.1e-6.g64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 148.03017644,
+      "expectation": 0.4685441079836708,
+      "log": "results/g_ext/weakS.orqa.tfim.7.1e-6.g64.launch.json",
+      "time": "10-18T10:30:59",
+      "sha256": "5e2acd4c883bdc7e607e30328b0b8819f309361c2b6965e94827dd8893c34641",
+      "backend": "orqa",
+      "circuit": "tfim",
+      "cutoff": 7.1e-06,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768996",
+      "id": "weakS.orqa.noise.7.1e-6.g64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 96.839968064,
+      "expectation": 0.17996079612888177,
+      "log": "results/g_ext/weakS.orqa.noise.7.1e-6.g64.launch.json",
+      "time": "10-18T10:32:51",
+      "sha256": "11c1d0ced0512708cb28900ae7e03ede63b0472aa618e7e06712e5aa42229416",
+      "backend": "orqa",
+      "circuit": "noise",
+      "cutoff": 7.1e-06,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768996",
+      "id": "weakL.monoprop.ki.2.3e-6.g64",
+      "status": "oom",
+      "exit": 1,
+      "wall": null,
+      "expectation": null,
+      "log": "results/g_ext/weakL.monoprop.ki.2.3e-6.g64.launch.json",
+      "time": "10-18T10:36:47",
+      "sha256": "13ca9f726788f153949cf4cebd22423b67b3686883cf27b15d4c74301e79b039",
+      "backend": "monoprop",
+      "circuit": "ki",
+      "cutoff": 2.3e-06,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "native",
+      "failure_evidence": "results/g_ext/weakL.monoprop.ki.2.3e-6.g64.stderr.txt"
+    },
+    {
+      "job": "59768998",
+      "id": "orqa.ki.3e-6.n32",
+      "status": "ok",
+      "exit": 0,
+      "wall": 382.779187968,
+      "expectation": 0.2892174706242761,
+      "log": "results/g_ext/orqa.ki.3e-6.n32.retry2.launch.json",
+      "time": "10-18T10:36:52",
+      "sha256": "f03f1fb3c3d2d58428c4bc8da2db0a475d456e6ae0a1ff62033145b02b6878a9",
+      "backend": "orqa",
+      "circuit": "ki",
+      "cutoff": 3e-06,
+      "nodes": 32,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768998",
+      "id": "orqa.ki.2e-6.n32",
+      "status": "oom",
+      "exit": 1,
+      "wall": null,
+      "expectation": null,
+      "log": "results/g_ext/orqa.ki.2e-6.n32.launch.json",
+      "time": "10-18T10:39:17",
+      "sha256": "caf51013a76a38ea37ed4d84311dff56cf95f1efd53e72a89c6d5d7e3d458151",
+      "backend": "orqa",
+      "circuit": "ki",
+      "cutoff": 2e-06,
+      "nodes": 32,
+      "gpus_used": 0,
+      "truncation": "matched",
+      "failure_evidence": "results/g_ext/orqa.ki.2e-6.n32.stderr.txt"
+    },
+    {
+      "job": "59768996",
+      "id": "weakL.monoprop.tfim.2.3e-6.g64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 451.04845062003005,
+      "expectation": 0.5147994141326007,
+      "log": "results/g_ext/weakL.monoprop.tfim.2.3e-6.g64.launch.json",
+      "time": "10-18T10:44:29",
+      "sha256": "38acd4825a87e30d4257ac7d38f3c43852eaba455467da39a3b9747ee9ed05e5",
+      "backend": "monoprop",
+      "circuit": "tfim",
+      "cutoff": 2.3e-06,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "native"
+    },
+    {
+      "job": "59768996",
+      "id": "weakL.orqa.noise.2.3e-6.g64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 658.865391236,
+      "expectation": 0.20259328030532087,
+      "log": "results/g_ext/weakL.orqa.noise.2.3e-6.g64.launch.json",
+      "time": "10-18T10:55:43",
+      "sha256": "e702890f35921315c22efbd874fddb7c15e3c27f0297522538a6ad044163d9c3",
+      "backend": "orqa",
+      "circuit": "noise",
+      "cutoff": 2.3e-06,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768996",
+      "id": "monoprop.tfim.1e-4.n16",
+      "status": "ok",
+      "exit": 0,
+      "wall": 0.3986732470220886,
+      "expectation": 0.3025026859596101,
+      "log": "results/g_ext/monoprop.tfim.1e-4.n16.launch.json",
+      "time": "10-18T10:55:49",
+      "sha256": "4c897d09b10f4fdf2df0c7944b00ecc5e26a9468cd1c7695dead2faed6a2686c",
+      "backend": "monoprop",
+      "circuit": "tfim",
+      "cutoff": 0.0001,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "native"
+    },
+    {
+      "job": "59768996",
+      "id": "monoprop.tfim.3e-5.n16",
+      "status": "ok",
+      "exit": 0,
+      "wall": 1.573464123008307,
+      "expectation": 0.37213520469494493,
+      "log": "results/g_ext/monoprop.tfim.3e-5.n16.launch.json",
+      "time": "10-18T10:55:56",
+      "sha256": "92dbc05757070e39a50802fd4ecb7584124dde48eeacbe47cd108092b18076a3",
+      "backend": "monoprop",
+      "circuit": "tfim",
+      "cutoff": 3e-05,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "native"
+    },
+    {
+      "job": "59768996",
+      "id": "monoprop.tfim.1e-5.n16",
+      "status": "ok",
+      "exit": 0,
+      "wall": 20.290626231988426,
+      "expectation": 0.4431112123934694,
+      "log": "results/g_ext/monoprop.tfim.1e-5.n16.launch.json",
+      "time": "10-18T10:56:22",
+      "sha256": "d7a4dec4783c118b169e8ee1968b5dec1fb9c421c192f0ec767a8beeb5469a98",
+      "backend": "monoprop",
+      "circuit": "tfim",
+      "cutoff": 1e-05,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "native"
+    },
+    {
+      "job": "59768996",
+      "id": "monoprop.tfim.5e-6.n16",
+      "status": "ok",
+      "exit": 0,
+      "wall": 89.94388689700281,
+      "expectation": 0.47639384035382143,
+      "log": "results/g_ext/monoprop.tfim.5e-6.n16.launch.json",
+      "time": "10-18T10:57:59",
+      "sha256": "70fed6254c3e21649e207fb3f6803e3de2990789dfdee2577c451b6022c565c0",
+      "backend": "monoprop",
+      "circuit": "tfim",
+      "cutoff": 5e-06,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "native"
+    },
+    {
+      "job": "59768996",
+      "id": "monoprop.tfim.3e-6.n16",
+      "status": "result_exit_nonzero",
+      "exit": 137,
+      "wall": null,
+      "expectation": 0.5009238683137939,
+      "log": "results/g_ext/monoprop.tfim.3e-6.n16.launch.json",
+      "time": "10-18T11:38:03",
+      "sha256": "186e647c8d174a410445974bd208d75b3ad6c3f9868ca1332330971acb721c63",
+      "backend": "monoprop",
+      "circuit": "tfim",
+      "cutoff": 3e-06,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "native",
+      "recorded_status": "ok",
+      "reported_solver_seconds": 261.12824386695866,
+      "failure_evidence": "results/g_ext/monoprop.tfim.3e-6.n16.stderr.txt"
+    },
+    {
+      "job": "59768996",
+      "id": "monoprop.tfim.2e-6.n16",
+      "status": "oom",
+      "exit": 1,
+      "wall": null,
+      "expectation": null,
+      "log": "results/g_ext/monoprop.tfim.2e-6.n16.launch.json",
+      "time": "10-18T11:40:58",
+      "sha256": "9b985cf3aa9fecb27d0be7e959c96aca0efd112f389ed6a3311b3480cf506ded",
+      "backend": "monoprop",
+      "circuit": "tfim",
+      "cutoff": 2e-06,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "native",
+      "failure_evidence": "results/g_ext/monoprop.tfim.2e-6.n16.stderr.txt"
+    },
+    {
+      "job": "59768996",
+      "id": "orqa.tfim.1e-4.n16",
+      "status": "ok",
+      "exit": 0,
+      "wall": 25.923995908,
+      "expectation": 0.32454766676636065,
+      "log": "results/g_ext/orqa.tfim.1e-4.n16.launch.json",
+      "time": "10-18T11:41:43",
+      "sha256": "52315fbf5051781cdf3ea5914fe02be8991bda4b8cae37b0037eb1f502d907cf",
+      "backend": "orqa",
+      "circuit": "tfim",
+      "cutoff": 0.0001,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768996",
+      "id": "orqa.tfim.3e-5.n16",
+      "status": "ok",
+      "exit": 0,
+      "wall": 30.864572881,
+      "expectation": 0.37793853502243735,
+      "log": "results/g_ext/orqa.tfim.3e-5.n16.launch.json",
+      "time": "10-18T11:42:29",
+      "sha256": "de9d46788c2d09990a6e9a79bce7a645747112b6bd5b9489154b48fd02f2a616",
+      "backend": "orqa",
+      "circuit": "tfim",
+      "cutoff": 3e-05,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768996",
+      "id": "orqa.tfim.1e-5.n16",
+      "status": "ok",
+      "exit": 0,
+      "wall": 85.189860972,
+      "expectation": 0.45139237392486553,
+      "log": "results/g_ext/orqa.tfim.1e-5.n16.launch.json",
+      "time": "10-18T11:44:09",
+      "sha256": "0abdd9468c8e2e976ab475c56e2dcf22c4b4ee0b2513ad1fa5eff6282a047b99",
+      "backend": "orqa",
+      "circuit": "tfim",
+      "cutoff": 1e-05,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768996",
+      "id": "orqa.tfim.5e-6.n16",
+      "status": "ok",
+      "exit": 0,
+      "wall": 273.896813748,
+      "expectation": 0.4842563488807078,
+      "log": "results/g_ext/orqa.tfim.5e-6.n16.launch.json",
+      "time": "10-18T11:48:57",
+      "sha256": "991eeb4cb5d8f55aa3d8dca30362feaab01e87f679cb6fb9a5a647f7df8081b8",
+      "backend": "orqa",
+      "circuit": "tfim",
+      "cutoff": 5e-06,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768996",
+      "id": "orqa.tfim.3e-6.n16",
+      "status": "ok",
+      "exit": 0,
+      "wall": 713.357776147,
+      "expectation": 0.5087823664937046,
+      "log": "results/g_ext/orqa.tfim.3e-6.n16.launch.json",
+      "time": "10-18T12:01:06",
+      "sha256": "baeceea13c1b1844af5221d082887abf426291dff8ec94cfe0ffd32680d9742b",
+      "backend": "orqa",
+      "circuit": "tfim",
+      "cutoff": 3e-06,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768996",
+      "id": "orqa.tfim.2e-6.n16",
+      "status": "oom",
+      "exit": 1,
+      "wall": null,
+      "expectation": null,
+      "log": "results/g_ext/orqa.tfim.2e-6.n16.launch.json",
+      "time": "10-18T12:05:29",
+      "sha256": "a7d9dc9b5556615daca8f0bda1740b70f410422070e151a3d864a5e1c2f5a40e",
+      "backend": "orqa",
+      "circuit": "tfim",
+      "cutoff": 2e-06,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "matched",
+      "failure_evidence": "results/g_ext/orqa.tfim.2e-6.n16.stderr.txt"
+    },
+    {
+      "job": "59768996",
+      "id": "orqa.noise.1e-4.n16",
+      "status": "ok",
+      "exit": 0,
+      "wall": 26.677811151,
+      "expectation": 0.15611406582676046,
+      "log": "results/g_ext/orqa.noise.1e-4.n16.launch.json",
+      "time": "10-18T12:06:16",
+      "sha256": "4e3eb7412a04ed16c203f11ecc97b4cc25deaff27bb149897c81a0f2dd93e874",
+      "backend": "orqa",
+      "circuit": "noise",
+      "cutoff": 0.0001,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768996",
+      "id": "orqa.noise.3e-5.n16",
+      "status": "ok",
+      "exit": 0,
+      "wall": 29.850924519,
+      "expectation": 0.15441995224633714,
+      "log": "results/g_ext/orqa.noise.3e-5.n16.launch.json",
+      "time": "10-18T12:07:01",
+      "sha256": "a1855d68fa5fd214588a54c71709cdaa4016e3dc8aa772889d0676a8b87b5c47",
+      "backend": "orqa",
+      "circuit": "noise",
+      "cutoff": 3e-05,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768996",
+      "id": "orqa.noise.1e-5.n16",
+      "status": "ok",
+      "exit": 0,
+      "wall": 62.294898666,
+      "expectation": 0.1733188298408881,
+      "log": "results/g_ext/orqa.noise.1e-5.n16.launch.json",
+      "time": "10-18T12:08:17",
+      "sha256": "edde564716b336920a2dfbd05aaad3ca4c59caebe413fd2b4da7c954cc3373e6",
+      "backend": "orqa",
+      "circuit": "noise",
+      "cutoff": 1e-05,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768996",
+      "id": "orqa.noise.5e-6.n16",
+      "status": "ok",
+      "exit": 0,
+      "wall": 169.267944358,
+      "expectation": 0.18717154103533293,
+      "log": "results/g_ext/orqa.noise.5e-6.n16.launch.json",
+      "time": "10-18T12:11:24",
+      "sha256": "ed6f4b95af4e563501ebec5b9aca3e494fb4914b73dc1dc045282881c46daa50",
+      "backend": "orqa",
+      "circuit": "noise",
+      "cutoff": 5e-06,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768996",
+      "id": "orqa.noise.3e-6.n16",
+      "status": "ok",
+      "exit": 0,
+      "wall": 408.846289167,
+      "expectation": 0.1976249403234659,
+      "log": "results/g_ext/orqa.noise.3e-6.n16.launch.json",
+      "time": "10-18T12:18:28",
+      "sha256": "a5bfed266b0f7505109d674ecca3675772293fbf9d735e41122cd33a8097bd6e",
+      "backend": "orqa",
+      "circuit": "noise",
+      "cutoff": 3e-06,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768996",
+      "id": "orqa.noise.2e-6.n16",
+      "status": "ok",
+      "exit": 0,
+      "wall": 854.688944706,
+      "expectation": 0.20524787751667073,
+      "log": "results/g_ext/orqa.noise.2e-6.n16.launch.json",
+      "time": "10-18T12:32:57",
+      "sha256": "7eb3104e4fc091cd7396ffca2e3bc1d6a29d0b8205756e77823fffdfd8ca3e14",
+      "backend": "orqa",
+      "circuit": "noise",
+      "cutoff": 2e-06,
+      "nodes": 16,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768999",
+      "id": "orqa.ki.1e-6.n64",
+      "status": "oom",
+      "exit": 1,
+      "wall": null,
+      "expectation": null,
+      "log": "results/g_ext/orqa.ki.1e-6.n64.launch.json",
+      "time": "10-19T17:52:52",
+      "sha256": "2dcabcaf65e87c19cf755160ada16a65f35d009be9adf5d89511e2010d8f92dc",
+      "backend": "orqa",
+      "circuit": "ki",
+      "cutoff": 1e-06,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "matched",
+      "failure_evidence": "results/g_ext/orqa.ki.1e-6.n64.stderr.txt"
+    },
+    {
+      "job": "59768999",
+      "id": "monoprop.tfim.1e-4.n64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 0.45658612599982007,
+      "expectation": 0.30250268595961016,
+      "log": "results/g_ext/monoprop.tfim.1e-4.n64.launch.json",
+      "time": "10-19T17:53:53",
+      "sha256": "dca8f22b74cb1edd3f74e18b4da775627d86725a06fd29bad87a7fd9733b11ba",
+      "backend": "monoprop",
+      "circuit": "tfim",
+      "cutoff": 0.0001,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "native"
+    },
+    {
+      "job": "59768999",
+      "id": "monoprop.tfim.3e-5.n64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 0.8061054999998305,
+      "expectation": 0.372135204694945,
+      "log": "results/g_ext/monoprop.tfim.3e-5.n64.launch.json",
+      "time": "10-19T17:54:22",
+      "sha256": "d4260c95f0e18cf54992e53fa88d221829bb4ed1dd0c0418bb3bb017a641ac75",
+      "backend": "monoprop",
+      "circuit": "tfim",
+      "cutoff": 3e-05,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "native"
+    },
+    {
+      "job": "59768999",
+      "id": "monoprop.tfim.1e-5.n64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 4.060329792999255,
+      "expectation": 0.4431112123934694,
+      "log": "results/g_ext/monoprop.tfim.1e-5.n64.launch.json",
+      "time": "10-19T17:57:53",
+      "sha256": "7afd598b820825b028a907a2016b5a589eea7ad4447edddfa4156d39da1ab342",
+      "backend": "monoprop",
+      "circuit": "tfim",
+      "cutoff": 1e-05,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "native"
+    },
+    {
+      "job": "59768999",
+      "id": "monoprop.tfim.5e-6.n64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 21.16735070499999,
+      "expectation": 0.4763938403538215,
+      "log": "results/g_ext/monoprop.tfim.5e-6.n64.launch.json",
+      "time": "10-19T17:59:59",
+      "sha256": "3b60487e94eb0aafa276d5ec2797d6a914599cecb264c4e44ebe6f674a70b55f",
+      "backend": "monoprop",
+      "circuit": "tfim",
+      "cutoff": 5e-06,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "native"
+    },
+    {
+      "job": "59768999",
+      "id": "monoprop.tfim.3e-6.n64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 63.70004195799993,
+      "expectation": 0.5009238683137939,
+      "log": "results/g_ext/monoprop.tfim.3e-6.n64.launch.json",
+      "time": "10-19T18:01:37",
+      "sha256": "a65dfd61905839d9ecc78c2d5626b524eee90ab0426cee85bafb4e6a5efd5d2b",
+      "backend": "monoprop",
+      "circuit": "tfim",
+      "cutoff": 3e-06,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "native"
+    },
+    {
+      "job": "59768999",
+      "id": "monoprop.tfim.2e-6.n64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 147.0640992589997,
+      "expectation": 0.5223134945234249,
+      "log": "results/g_ext/monoprop.tfim.2e-6.n64.launch.json",
+      "time": "10-19T18:04:34",
+      "sha256": "de2ce2c0fa3ab753af9745584a3b2288176ff1bf5e5c7926a4e716801958f9ea",
+      "backend": "monoprop",
+      "circuit": "tfim",
+      "cutoff": 2e-06,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "native"
+    },
+    {
+      "job": "59768999",
+      "id": "monoprop.tfim.1e-6.n64",
+      "status": "oom",
+      "exit": 1,
+      "wall": null,
+      "expectation": null,
+      "log": "results/g_ext/monoprop.tfim.1e-6.n64.launch.json",
+      "time": "10-19T18:08:07",
+      "sha256": "494f68986727c4184c5f81022e4b80300df5c8b7bc73d5b3c140f73ce6530844",
+      "backend": "monoprop",
+      "circuit": "tfim",
+      "cutoff": 1e-06,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "native",
+      "failure_evidence": "results/g_ext/monoprop.tfim.1e-6.n64.stderr.txt"
+    },
+    {
+      "job": "59768999",
+      "id": "orqa.tfim.1e-4.n64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 41.887562792,
+      "expectation": 0.3245476667663606,
+      "log": "results/g_ext/orqa.tfim.1e-4.n64.launch.json",
+      "time": "10-19T18:10:17",
+      "sha256": "64c04b632b710267d0cfe0e6b9ae5101654a395a116416e65849297036d4a5eb",
+      "backend": "orqa",
+      "circuit": "tfim",
+      "cutoff": 0.0001,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768999",
+      "id": "orqa.tfim.3e-5.n64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 42.678809538,
+      "expectation": 0.37793853502243735,
+      "log": "results/g_ext/orqa.tfim.3e-5.n64.launch.json",
+      "time": "10-19T18:11:14",
+      "sha256": "0d1a9d12b11f00fc6758a6a3ce2b9a48cb0afd7d824463e048ef853adf07c6f5",
+      "backend": "orqa",
+      "circuit": "tfim",
+      "cutoff": 3e-05,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768999",
+      "id": "orqa.tfim.1e-5.n64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 55.977904963,
+      "expectation": 0.45139237392486553,
+      "log": "results/g_ext/orqa.tfim.1e-5.n64.launch.json",
+      "time": "10-19T18:13:15",
+      "sha256": "1425b7d644adaf008ac872f0d667623c5c346bd4b9051267e9875ba9404590db",
+      "backend": "orqa",
+      "circuit": "tfim",
+      "cutoff": 1e-05,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768999",
+      "id": "orqa.tfim.5e-6.n64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 104.824891614,
+      "expectation": 0.4842563488807078,
+      "log": "results/g_ext/orqa.tfim.5e-6.n64.launch.json",
+      "time": "10-19T18:15:43",
+      "sha256": "d4db07a8a67fcfe6a9bb23ed5e378e74136a7a5a4d7d24244d792f9be4d553b0",
+      "backend": "orqa",
+      "circuit": "tfim",
+      "cutoff": 5e-06,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59768999",
+      "id": "orqa.tfim.3e-6.n64",
+      "status": "ok",
+      "exit": 0,
+      "wall": 221.697337559,
+      "expectation": 0.5087823664937046,
+      "log": "results/g_ext/orqa.tfim.3e-6.n64.launch.json",
+      "time": "10-19T18:20:00",
+      "sha256": "7d148bc45320ba9d4c7d7e61b47af8aca11d1aa63a70d2cf66abf617533b4a3c",
+      "backend": "orqa",
+      "circuit": "tfim",
+      "cutoff": 3e-06,
+      "nodes": 64,
+      "gpus_used": 0,
+      "truncation": "matched"
+    },
+    {
+      "job": "59769000",
+      "id": "cupp.tfim.1e-4.g512",
+      "status": "ok",
+      "exit": 0,
+      "wall": 136.339,
+      "expectation": 0.324547666766,
+      "log": "logs/s/cupp.tfim.1e-4.g512.out",
+      "time": "10-19T19:58:53",
+      "sha256": "1a4e4e3c1eae1f68274dba0d6a636c0519a7d6637a323b35e5672037b3b07928",
+      "backend": "cupp",
+      "circuit": "tfim",
+      "cutoff": 0.0001,
+      "nodes": 128,
+      "gpus_used": 512,
+      "truncation": "interval10",
+      "binary": "pp_engine_g0",
+      "args": "--circuit tfim_hh --theta 0.2 --phi -0.3 --steps 20 --coef 1e-4 --vram-frac 0.9 plugin=orig",
+      "input": "original"
+    },
+    {
+      "job": "59769000",
+      "id": "cupp.tfim.3e-5.g512",
+      "status": "ok",
+      "exit": 0,
+      "wall": 139.555,
+      "expectation": 0.377938535022,
+      "log": "logs/s/cupp.tfim.3e-5.g512.out",
+      "time": "10-19T20:02:02",
+      "sha256": "d640431e0944a45fa55df6edaddbce88b0769a2b3d8775410b8de41f72909f4c",
+      "backend": "cupp",
+      "circuit": "tfim",
+      "cutoff": 3e-05,
+      "nodes": 128,
+      "gpus_used": 512,
+      "truncation": "interval10",
+      "binary": "pp_engine_g0",
+      "args": "--circuit tfim_hh --theta 0.2 --phi -0.3 --steps 20 --coef 3e-5 --vram-frac 0.9 plugin=orig",
+      "input": "original"
+    },
+    {
+      "job": "59769000",
+      "id": "cupp.tfim.1e-5.g512",
+      "status": "ok",
+      "exit": 0,
+      "wall": 145.122,
+      "expectation": 0.451392373925,
+      "log": "logs/s/cupp.tfim.1e-5.g512.out",
+      "time": "10-19T20:05:01",
+      "sha256": "b233f124c9197f9082e898d872017d432cd9440956b3d45fd3215ace8a1975f5",
+      "backend": "cupp",
+      "circuit": "tfim",
+      "cutoff": 1e-05,
+      "nodes": 128,
+      "gpus_used": 512,
+      "truncation": "interval10",
+      "binary": "pp_engine_g0",
+      "args": "--circuit tfim_hh --theta 0.2 --phi -0.3 --steps 20 --coef 1e-5 --vram-frac 0.9 plugin=orig",
+      "input": "original"
+    },
+    {
+      "job": "59769000",
+      "id": "cupp.tfim.5e-6.g512",
+      "status": "ok",
+      "exit": 0,
+      "wall": 152.62,
+      "expectation": 0.484256348881,
+      "log": "logs/s/cupp.tfim.5e-6.g512.out",
+      "time": "10-19T20:08:07",
+      "sha256": "5dfa387be0347aa9cac611d1ad33a7da01d99c02619e91a24a301f0c62a22cd4",
+      "backend": "cupp",
+      "circuit": "tfim",
+      "cutoff": 5e-06,
+      "nodes": 128,
+      "gpus_used": 512,
+      "truncation": "interval10",
+      "binary": "pp_engine_g0",
+      "args": "--circuit tfim_hh --theta 0.2 --phi -0.3 --steps 20 --coef 5e-6 --vram-frac 0.9 plugin=orig",
+      "input": "original"
+    },
+    {
+      "job": "59769000",
+      "id": "cupp.tfim.3e-6.g512",
+      "status": "ok",
+      "exit": 0,
+      "wall": 173.454,
+      "expectation": 0.508782366494,
+      "log": "logs/s/cupp.tfim.3e-6.g512.out",
+      "time": "10-19T20:11:06",
+      "sha256": "f280fc9bc0ddf9e1954d8a3f9208ff5076ba0c8189df787109680fa101a4eb54",
+      "backend": "cupp",
+      "circuit": "tfim",
+      "cutoff": 3e-06,
+      "nodes": 128,
+      "gpus_used": 512,
+      "truncation": "interval10",
+      "binary": "pp_engine_g0",
+      "args": "--circuit tfim_hh --theta 0.2 --phi -0.3 --steps 20 --coef 3e-6 --vram-frac 0.9 plugin=orig",
+      "input": "original"
+    },
+    {
+      "job": "59769000",
+      "id": "cupp.tfim.2e-6.g512",
+      "status": "ok",
+      "exit": 0,
+      "wall": 201.243,
+      "expectation": 0.530387234817,
+      "log": "logs/s/cupp.tfim.2e-6.g512.out",
+      "time": "10-19T20:15:47",
+      "sha256": "474c58d45f44ce7d65e98991dd495e4d696ed86d10394c8aefa97f1482445731",
+      "backend": "cupp",
+      "circuit": "tfim",
+      "cutoff": 2e-06,
+      "nodes": 128,
+      "gpus_used": 512,
+      "truncation": "interval10",
+      "binary": "pp_engine_g0",
+      "args": "--circuit tfim_hh --theta 0.2 --phi -0.3 --steps 20 --coef 2e-6 --vram-frac 0.9 plugin=orig",
+      "input": "original"
+    },
+    {
+      "job": "59769000",
+      "id": "cupp.tfim.1e-6.g512",
+      "status": "oom",
+      "exit": 255,
+      "wall": null,
+      "expectation": null,
+      "log": "logs/s/cupp.tfim.1e-6.g512.out",
+      "time": "10-19T20:18:17",
+      "sha256": "94a163c84b6c0cd0f1b87d21fe11e1418b9bb842769ff4331ae2bab704ddd30a",
+      "backend": "cupp",
+      "circuit": "tfim",
+      "cutoff": 1e-06,
+      "nodes": 128,
+      "gpus_used": 512,
+      "truncation": "interval10",
+      "binary": "pp_engine_g0",
+      "args": "--circuit tfim_hh --theta 0.2 --phi -0.3 --steps 20 --coef 1e-6 --vram-frac 0.9 plugin=orig",
+      "input": "original",
+      "failure_evidence": "logs/s/cupp.tfim.1e-6.g512.out"
+    },
+    {
+      "job": "59769000",
+      "id": "cupp.noise.1e-4.g512",
+      "status": "ok",
+      "exit": 0,
+      "wall": 133.7,
+      "expectation": 0.156114065827,
+      "log": "logs/s/cupp.noise.1e-4.g512.out",
+      "time": "10-19T20:21:20",
+      "sha256": "7ebf10a4cd726bd4a9b748211565e0b1d27efcaa176f30d034182381e8308bed",
+      "backend": "cupp",
+      "circuit": "noise",
+      "cutoff": 0.0001,
+      "nodes": 128,
+      "gpus_used": 512,
+      "truncation": "interval10",
+      "binary": "pp_engine_g0",
+      "args": "--circuit ki_noisy --noise 0.005 --coef 1e-4 --vram-frac 0.9 plugin=orig",
+      "input": "frame"
+    },
+    {
+      "job": "59769000",
+      "id": "cupp.noise.3e-5.g512",
+      "status": "ok",
+      "exit": 0,
+      "wall": 144.082,
+      "expectation": 0.154419952246,
+      "log": "logs/s/cupp.noise.3e-5.g512.out",
+      "time": "10-19T20:25:07",
+      "sha256": "2c98e1d12f4bb2c3ca28f47176e16d1e762d06fe6e1ff9f121b30c0f73ae5a5a",
+      "backend": "cupp",
+      "circuit": "noise",
+      "cutoff": 3e-05,
+      "nodes": 128,
+      "gpus_used": 512,
+      "truncation": "interval10",
+      "binary": "pp_engine_g0",
+      "args": "--circuit ki_noisy --noise 0.005 --coef 3e-5 --vram-frac 0.9 plugin=orig",
+      "input": "frame"
+    },
+    {
+      "job": "59769000",
+      "id": "cupp.noise.1e-5.g512",
+      "status": "ok",
+      "exit": 0,
+      "wall": 145.312,
+      "expectation": 0.173318829841,
+      "log": "logs/s/cupp.noise.1e-5.g512.out",
+      "time": "10-19T20:27:37",
+      "sha256": "d8af543317906ef8f3ec931ce909fb610a97aeb3533569182b251a16d15abffd",
+      "backend": "cupp",
+      "circuit": "noise",
+      "cutoff": 1e-05,
+      "nodes": 128,
+      "gpus_used": 512,
+      "truncation": "interval10",
+      "binary": "pp_engine_g0",
+      "args": "--circuit ki_noisy --noise 0.005 --coef 1e-5 --vram-frac 0.9 plugin=orig",
+      "input": "frame"
+    },
+    {
+      "job": "59769000",
+      "id": "cupp.noise.5e-6.g512",
+      "status": "ok",
+      "exit": 0,
+      "wall": 152.053,
+      "expectation": 0.187171541035,
+      "log": "logs/s/cupp.noise.5e-6.g512.out",
+      "time": "10-19T20:30:58",
+      "sha256": "cabfd52d7284a071a080dee7d575cd50d785d5d7aacacb465031c0c0e52f9be2",
+      "backend": "cupp",
+      "circuit": "noise",
+      "cutoff": 5e-06,
+      "nodes": 128,
+      "gpus_used": 512,
+      "truncation": "interval10",
+      "binary": "pp_engine_g0",
+      "args": "--circuit ki_noisy --noise 0.005 --coef 5e-6 --vram-frac 0.9 plugin=orig",
+      "input": "frame"
+    }
+  ],
+  "fill_plan": [
+    {
+      "id": "cupp.tfim.1e-4.g512",
+      "nodes": 128,
+      "status": "ok",
+      "job": "59769000",
+      "wall": 136.339,
+      "log": "logs/s/cupp.tfim.1e-4.g512.out"
+    },
+    {
+      "id": "cupp.tfim.3e-5.g512",
+      "nodes": 128,
+      "status": "ok",
+      "job": "59769000",
+      "wall": 139.555,
+      "log": "logs/s/cupp.tfim.3e-5.g512.out"
+    },
+    {
+      "id": "cupp.tfim.1e-5.g512",
+      "nodes": 128,
+      "status": "ok",
+      "job": "59769000",
+      "wall": 145.122,
+      "log": "logs/s/cupp.tfim.1e-5.g512.out"
+    },
+    {
+      "id": "cupp.tfim.5e-6.g512",
+      "nodes": 128,
+      "status": "ok",
+      "job": "59769000",
+      "wall": 152.62,
+      "log": "logs/s/cupp.tfim.5e-6.g512.out"
+    },
+    {
+      "id": "cupp.tfim.3e-6.g512",
+      "nodes": 128,
+      "status": "ok",
+      "job": "59769000",
+      "wall": 173.454,
+      "log": "logs/s/cupp.tfim.3e-6.g512.out"
+    },
+    {
+      "id": "cupp.tfim.2e-6.g512",
+      "nodes": 128,
+      "status": "ok",
+      "job": "59769000",
+      "wall": 201.243,
+      "log": "logs/s/cupp.tfim.2e-6.g512.out"
+    },
+    {
+      "id": "cupp.tfim.1e-6.g512",
+      "nodes": 128,
+      "status": "oom",
+      "job": "59769000",
+      "wall": null,
+      "log": "logs/s/cupp.tfim.1e-6.g512.out"
+    },
+    {
+      "id": "cupp.noise.1e-4.g512",
+      "nodes": 128,
+      "status": "ok",
+      "job": "59769000",
+      "wall": 133.7,
+      "log": "logs/s/cupp.noise.1e-4.g512.out"
+    },
+    {
+      "id": "cupp.noise.3e-5.g512",
+      "nodes": 128,
+      "status": "ok",
+      "job": "59769000",
+      "wall": 144.082,
+      "log": "logs/s/cupp.noise.3e-5.g512.out"
+    },
+    {
+      "id": "cupp.noise.1e-5.g512",
+      "nodes": 128,
+      "status": "ok",
+      "job": "59769000",
+      "wall": 145.312,
+      "log": "logs/s/cupp.noise.1e-5.g512.out"
+    },
+    {
+      "id": "cupp.noise.5e-6.g512",
+      "nodes": 128,
+      "status": "ok",
+      "job": "59769000",
+      "wall": 152.053,
+      "log": "logs/s/cupp.noise.5e-6.g512.out"
+    },
+    {
+      "id": "cupp.noise.3e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "cupp.noise.2e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "cupp.noise.1e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "cupp.ki.1e-4.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "cupp.ki.3e-5.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "defer.ki.1e-4.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "defer.ki.3e-5.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "defer.ki.1e-5.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "defer.ki.5e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "defer.ki.3e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "defer.ki.2e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "defer.ki.1e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "defer.tfim.1e-4.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "defer.tfim.3e-5.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "defer.tfim.1e-5.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "defer.tfim.5e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "defer.tfim.3e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "defer.tfim.2e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "defer.tfim.1e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "defer.noise.1e-4.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "defer.noise.3e-5.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "defer.noise.1e-5.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "defer.noise.5e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "defer.noise.3e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "defer.noise.2e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "defer.noise.1e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "o.cupp.ki.1e-4.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "o.cupp.ki.3e-5.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "o.cupp.noise.1e-4.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "o.cupp.noise.3e-5.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "o.cupp.noise.1e-5.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "o.cupp.noise.5e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "o.cupp.noise.3e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "o.cupp.noise.2e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "o.cupp.noise.1e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "weakSc.ki.2.4e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "weakSd.ki.2.4e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "weakLc.ki.8e-7.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "o.weakSc.ki.2.4e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "o.weakLc.ki.8e-7.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "weakSc.tfim.2.4e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "weakSd.tfim.2.4e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "weakLc.tfim.8e-7.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "weakSc.noise.2.4e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "weakSd.noise.2.4e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "weakLc.noise.8e-7.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "o.weakSc.noise.2.4e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "o.weakLc.noise.8e-7.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.2e-6.n8",
+      "nodes": 8,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.1e-6.n8",
+      "nodes": 8,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.7e-7.n8",
+      "nodes": 8,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.5e-7.n8",
+      "nodes": 8,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.3e-7.n8",
+      "nodes": 8,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.2e-7.n8",
+      "nodes": 8,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.2e-6.n8",
+      "nodes": 8,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.1e-6.n8",
+      "nodes": 8,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.7e-7.n8",
+      "nodes": 8,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.5e-7.n8",
+      "nodes": 8,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.3e-7.n8",
+      "nodes": 8,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.2e-7.n8",
+      "nodes": 8,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.tfim.1e-4.n8",
+      "nodes": 8,
+      "status": "ok",
+      "job": "59768995",
+      "wall": 0.4643336699809879,
+      "log": "results/g_ext/monoprop.tfim.1e-4.n8.launch.json"
+    },
+    {
+      "id": "monoprop.tfim.3e-5.n8",
+      "nodes": 8,
+      "status": "ok",
+      "job": "59768995",
+      "wall": 3.079779961000895,
+      "log": "results/g_ext/monoprop.tfim.3e-5.n8.launch.json"
+    },
+    {
+      "id": "monoprop.tfim.1e-5.n8",
+      "nodes": 8,
+      "status": "ok",
+      "job": "59660397",
+      "wall": 42.53719644807279,
+      "log": "results/g_ext/monoprop.tfim.1e-5.n8.launch.json"
+    },
+    {
+      "id": "monoprop.tfim.5e-6.n8",
+      "nodes": 8,
+      "status": "ok",
+      "job": "59768995",
+      "wall": 181.74495382097666,
+      "log": "results/g_ext/monoprop.tfim.5e-6.n8.launch.json"
+    },
+    {
+      "id": "monoprop.tfim.3e-6.n8",
+      "nodes": 8,
+      "status": "oom",
+      "job": "59768995",
+      "wall": null,
+      "log": "results/g_ext/monoprop.tfim.3e-6.n8.launch.json"
+    },
+    {
+      "id": "monoprop.tfim.2e-6.n8",
+      "nodes": 8,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.tfim.1e-6.n8",
+      "nodes": 8,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.tfim.1e-4.n8",
+      "nodes": 8,
+      "status": "ok",
+      "job": "59768995",
+      "wall": 22.263350663,
+      "log": "results/g_ext/orqa.tfim.1e-4.n8.launch.json"
+    },
+    {
+      "id": "orqa.tfim.3e-5.n8",
+      "nodes": 8,
+      "status": "ok",
+      "job": "59768995",
+      "wall": 32.765458835,
+      "log": "results/g_ext/orqa.tfim.3e-5.n8.launch.json"
+    },
+    {
+      "id": "orqa.tfim.1e-5.n8",
+      "nodes": 8,
+      "status": "ok",
+      "job": "59660397",
+      "wall": 139.887722106,
+      "log": "results/g_ext/orqa.tfim.1e-5.n8.launch.json"
+    },
+    {
+      "id": "orqa.tfim.5e-6.n8",
+      "nodes": 8,
+      "status": "ok",
+      "job": "59768995",
+      "wall": 507.01935906,
+      "log": "results/g_ext/orqa.tfim.5e-6.n8.launch.json"
+    },
+    {
+      "id": "orqa.tfim.3e-6.n8",
+      "nodes": 8,
+      "status": "oom",
+      "job": "59768995",
+      "wall": null,
+      "log": "results/g_ext/orqa.tfim.3e-6.n8.launch.json"
+    },
+    {
+      "id": "orqa.tfim.2e-6.n8",
+      "nodes": 8,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.tfim.1e-6.n8",
+      "nodes": 8,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.noise.1e-4.n8",
+      "nodes": 8,
+      "status": "ok",
+      "job": "59768995",
+      "wall": 23.880503525,
+      "log": "results/g_ext/orqa.noise.1e-4.n8.launch.json"
+    },
+    {
+      "id": "orqa.noise.3e-5.n8",
+      "nodes": 8,
+      "status": "ok",
+      "job": "59768995",
+      "wall": 30.070980102,
+      "log": "results/g_ext/orqa.noise.3e-5.n8.launch.json"
+    },
+    {
+      "id": "orqa.noise.1e-5.n8",
+      "nodes": 8,
+      "status": "ok",
+      "job": "59660397",
+      "wall": 93.551926356,
+      "log": "results/g_ext/orqa.noise.1e-5.n8.launch.json"
+    },
+    {
+      "id": "orqa.noise.5e-6.n8",
+      "nodes": 8,
+      "status": "ok",
+      "job": "59768995",
+      "wall": 305.667170544,
+      "log": "results/g_ext/orqa.noise.5e-6.n8.launch.json"
+    },
+    {
+      "id": "orqa.noise.3e-6.n8",
+      "nodes": 8,
+      "status": "ok",
+      "job": "59768995",
+      "wall": 777.701635632,
+      "log": "results/g_ext/orqa.noise.3e-6.n8.launch.json"
+    },
+    {
+      "id": "orqa.noise.2e-6.n8",
+      "nodes": 8,
+      "status": "oom",
+      "job": "59768995",
+      "wall": null,
+      "log": "results/g_ext/orqa.noise.2e-6.n8.launch.json"
+    },
+    {
+      "id": "orqa.noise.1e-6.n8",
+      "nodes": 8,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.2e-6.n16",
+      "nodes": 16,
+      "status": "oom",
+      "job": "59697597",
+      "wall": null,
+      "log": "results/g_ext/monoprop.ki.2e-6.n16.launch.json"
+    },
+    {
+      "id": "monoprop.ki.1e-6.n16",
+      "nodes": 16,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.7e-7.n16",
+      "nodes": 16,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.5e-7.n16",
+      "nodes": 16,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.3e-7.n16",
+      "nodes": 16,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.2e-7.n16",
+      "nodes": 16,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.2e-6.n16",
+      "nodes": 16,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.1e-6.n16",
+      "nodes": 16,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.7e-7.n16",
+      "nodes": 16,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.5e-7.n16",
+      "nodes": 16,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.3e-7.n16",
+      "nodes": 16,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.2e-7.n16",
+      "nodes": 16,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.tfim.1e-4.n16",
+      "nodes": 16,
+      "status": "ok",
+      "job": "59768996",
+      "wall": 0.3986732470220886,
+      "log": "results/g_ext/monoprop.tfim.1e-4.n16.launch.json"
+    },
+    {
+      "id": "monoprop.tfim.3e-5.n16",
+      "nodes": 16,
+      "status": "ok",
+      "job": "59768996",
+      "wall": 1.573464123008307,
+      "log": "results/g_ext/monoprop.tfim.3e-5.n16.launch.json"
+    },
+    {
+      "id": "monoprop.tfim.1e-5.n16",
+      "nodes": 16,
+      "status": "ok",
+      "job": "59768996",
+      "wall": 20.290626231988426,
+      "log": "results/g_ext/monoprop.tfim.1e-5.n16.launch.json"
+    },
+    {
+      "id": "monoprop.tfim.5e-6.n16",
+      "nodes": 16,
+      "status": "ok",
+      "job": "59768996",
+      "wall": 89.94388689700281,
+      "log": "results/g_ext/monoprop.tfim.5e-6.n16.launch.json"
+    },
+    {
+      "id": "monoprop.tfim.3e-6.n16",
+      "nodes": 16,
+      "status": "result_exit_nonzero",
+      "job": "59768996",
+      "wall": null,
+      "log": "results/g_ext/monoprop.tfim.3e-6.n16.launch.json"
+    },
+    {
+      "id": "monoprop.tfim.2e-6.n16",
+      "nodes": 16,
+      "status": "oom",
+      "job": "59768996",
+      "wall": null,
+      "log": "results/g_ext/monoprop.tfim.2e-6.n16.launch.json"
+    },
+    {
+      "id": "monoprop.tfim.1e-6.n16",
+      "nodes": 16,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.tfim.1e-4.n16",
+      "nodes": 16,
+      "status": "ok",
+      "job": "59768996",
+      "wall": 25.923995908,
+      "log": "results/g_ext/orqa.tfim.1e-4.n16.launch.json"
+    },
+    {
+      "id": "orqa.tfim.3e-5.n16",
+      "nodes": 16,
+      "status": "ok",
+      "job": "59768996",
+      "wall": 30.864572881,
+      "log": "results/g_ext/orqa.tfim.3e-5.n16.launch.json"
+    },
+    {
+      "id": "orqa.tfim.1e-5.n16",
+      "nodes": 16,
+      "status": "ok",
+      "job": "59768996",
+      "wall": 85.189860972,
+      "log": "results/g_ext/orqa.tfim.1e-5.n16.launch.json"
+    },
+    {
+      "id": "orqa.tfim.5e-6.n16",
+      "nodes": 16,
+      "status": "ok",
+      "job": "59768996",
+      "wall": 273.896813748,
+      "log": "results/g_ext/orqa.tfim.5e-6.n16.launch.json"
+    },
+    {
+      "id": "orqa.tfim.3e-6.n16",
+      "nodes": 16,
+      "status": "ok",
+      "job": "59768996",
+      "wall": 713.357776147,
+      "log": "results/g_ext/orqa.tfim.3e-6.n16.launch.json"
+    },
+    {
+      "id": "orqa.tfim.2e-6.n16",
+      "nodes": 16,
+      "status": "oom",
+      "job": "59768996",
+      "wall": null,
+      "log": "results/g_ext/orqa.tfim.2e-6.n16.launch.json"
+    },
+    {
+      "id": "orqa.tfim.1e-6.n16",
+      "nodes": 16,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.noise.1e-4.n16",
+      "nodes": 16,
+      "status": "ok",
+      "job": "59768996",
+      "wall": 26.677811151,
+      "log": "results/g_ext/orqa.noise.1e-4.n16.launch.json"
+    },
+    {
+      "id": "orqa.noise.3e-5.n16",
+      "nodes": 16,
+      "status": "ok",
+      "job": "59768996",
+      "wall": 29.850924519,
+      "log": "results/g_ext/orqa.noise.3e-5.n16.launch.json"
+    },
+    {
+      "id": "orqa.noise.1e-5.n16",
+      "nodes": 16,
+      "status": "ok",
+      "job": "59768996",
+      "wall": 62.294898666,
+      "log": "results/g_ext/orqa.noise.1e-5.n16.launch.json"
+    },
+    {
+      "id": "orqa.noise.5e-6.n16",
+      "nodes": 16,
+      "status": "ok",
+      "job": "59768996",
+      "wall": 169.267944358,
+      "log": "results/g_ext/orqa.noise.5e-6.n16.launch.json"
+    },
+    {
+      "id": "orqa.noise.3e-6.n16",
+      "nodes": 16,
+      "status": "ok",
+      "job": "59768996",
+      "wall": 408.846289167,
+      "log": "results/g_ext/orqa.noise.3e-6.n16.launch.json"
+    },
+    {
+      "id": "orqa.noise.2e-6.n16",
+      "nodes": 16,
+      "status": "ok",
+      "job": "59768996",
+      "wall": 854.688944706,
+      "log": "results/g_ext/orqa.noise.2e-6.n16.launch.json"
+    },
+    {
+      "id": "orqa.noise.1e-6.n16",
+      "nodes": 16,
+      "status": "predicted_tl",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.2e-6.n32",
+      "nodes": 32,
+      "status": "ok",
+      "job": "59727483",
+      "wall": 197.175478863006,
+      "log": "results/g_ext/monoprop.ki.2e-6.n32.launch.json"
+    },
+    {
+      "id": "monoprop.ki.1e-6.n32",
+      "nodes": 32,
+      "status": "oom",
+      "job": "59727483",
+      "wall": null,
+      "log": "results/g_ext/monoprop.ki.1e-6.n32.launch.json"
+    },
+    {
+      "id": "monoprop.ki.7e-7.n32",
+      "nodes": 32,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.5e-7.n32",
+      "nodes": 32,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.3e-7.n32",
+      "nodes": 32,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.2e-7.n32",
+      "nodes": 32,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.2e-6.n32",
+      "nodes": 32,
+      "status": "oom",
+      "job": "59768998",
+      "wall": null,
+      "log": "results/g_ext/orqa.ki.2e-6.n32.launch.json"
+    },
+    {
+      "id": "orqa.ki.1e-6.n32",
+      "nodes": 32,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.7e-7.n32",
+      "nodes": 32,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.5e-7.n32",
+      "nodes": 32,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.3e-7.n32",
+      "nodes": 32,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.2e-7.n32",
+      "nodes": 32,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.tfim.1e-4.n32",
+      "nodes": 32,
+      "status": "ok",
+      "job": "59727483",
+      "wall": 0.5717047410435043,
+      "log": "results/g_ext/monoprop.tfim.1e-4.n32.launch.json"
+    },
+    {
+      "id": "monoprop.tfim.3e-5.n32",
+      "nodes": 32,
+      "status": "ok",
+      "job": "59727483",
+      "wall": 0.9141700670006685,
+      "log": "results/g_ext/monoprop.tfim.3e-5.n32.launch.json"
+    },
+    {
+      "id": "monoprop.tfim.1e-5.n32",
+      "nodes": 32,
+      "status": "ok",
+      "job": "59727483",
+      "wall": 9.478239642994595,
+      "log": "results/g_ext/monoprop.tfim.1e-5.n32.launch.json"
+    },
+    {
+      "id": "monoprop.tfim.5e-6.n32",
+      "nodes": 32,
+      "status": "ok",
+      "job": "59727483",
+      "wall": 43.999886145000346,
+      "log": "results/g_ext/monoprop.tfim.5e-6.n32.launch.json"
+    },
+    {
+      "id": "monoprop.tfim.3e-6.n32",
+      "nodes": 32,
+      "status": "ok",
+      "job": "59727483",
+      "wall": 129.31903765909374,
+      "log": "results/g_ext/monoprop.tfim.3e-6.n32.launch.json"
+    },
+    {
+      "id": "monoprop.tfim.2e-6.n32",
+      "nodes": 32,
+      "status": "ok",
+      "job": "59727483",
+      "wall": 298.08346704300493,
+      "log": "results/g_ext/monoprop.tfim.2e-6.n32.launch.json"
+    },
+    {
+      "id": "monoprop.tfim.1e-6.n32",
+      "nodes": 32,
+      "status": "oom",
+      "job": "59768998",
+      "wall": null,
+      "log": "results/g_ext/monoprop.tfim.1e-6.n32.launch.json"
+    },
+    {
+      "id": "orqa.tfim.1e-4.n32",
+      "nodes": 32,
+      "status": "ok",
+      "job": "59727483",
+      "wall": 33.002203196,
+      "log": "results/g_ext/orqa.tfim.1e-4.n32.launch.json"
+    },
+    {
+      "id": "orqa.tfim.3e-5.n32",
+      "nodes": 32,
+      "status": "ok",
+      "job": "59727483",
+      "wall": 34.596941675,
+      "log": "results/g_ext/orqa.tfim.3e-5.n32.launch.json"
+    },
+    {
+      "id": "orqa.tfim.1e-5.n32",
+      "nodes": 32,
+      "status": "ok",
+      "job": "59727483",
+      "wall": 61.54956003,
+      "log": "results/g_ext/orqa.tfim.1e-5.n32.launch.json"
+    },
+    {
+      "id": "orqa.tfim.5e-6.n32",
+      "nodes": 32,
+      "status": "ok",
+      "job": "59727483",
+      "wall": 156.49365808,
+      "log": "results/g_ext/orqa.tfim.5e-6.n32.launch.json"
+    },
+    {
+      "id": "orqa.tfim.3e-6.n32",
+      "nodes": 32,
+      "status": "ok",
+      "job": "59727483",
+      "wall": 381.033050389,
+      "log": "results/g_ext/orqa.tfim.3e-6.n32.launch.json"
+    },
+    {
+      "id": "orqa.tfim.2e-6.n32",
+      "nodes": 32,
+      "status": "ok",
+      "job": "59768998",
+      "wall": 860.093922444,
+      "log": "results/g_ext/orqa.tfim.2e-6.n32.launch.json"
+    },
+    {
+      "id": "orqa.tfim.1e-6.n32",
+      "nodes": 32,
+      "status": "predicted_tl",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.noise.1e-4.n32",
+      "nodes": 32,
+      "status": "ok",
+      "job": "59768998",
+      "wall": 31.49391939,
+      "log": "results/g_ext/orqa.noise.1e-4.n32.launch.json"
+    },
+    {
+      "id": "orqa.noise.3e-5.n32",
+      "nodes": 32,
+      "status": "ok",
+      "job": "59768998",
+      "wall": 34.345959866,
+      "log": "results/g_ext/orqa.noise.3e-5.n32.launch.json"
+    },
+    {
+      "id": "orqa.noise.1e-5.n32",
+      "nodes": 32,
+      "status": "ok",
+      "job": "59768998",
+      "wall": 52.139686715,
+      "log": "results/g_ext/orqa.noise.1e-5.n32.launch.json"
+    },
+    {
+      "id": "orqa.noise.5e-6.n32",
+      "nodes": 32,
+      "status": "ok",
+      "job": "59768998",
+      "wall": 103.212011413,
+      "log": "results/g_ext/orqa.noise.5e-6.n32.launch.json"
+    },
+    {
+      "id": "orqa.noise.3e-6.n32",
+      "nodes": 32,
+      "status": "ok",
+      "job": "59768998",
+      "wall": 223.338058541,
+      "log": "results/g_ext/orqa.noise.3e-6.n32.launch.json"
+    },
+    {
+      "id": "orqa.noise.2e-6.n32",
+      "nodes": 32,
+      "status": "ok",
+      "job": "59768998",
+      "wall": 450.607332921,
+      "log": "results/g_ext/orqa.noise.2e-6.n32.launch.json"
+    },
+    {
+      "id": "orqa.noise.1e-6.n32",
+      "nodes": 32,
+      "status": "oom",
+      "job": "59768998",
+      "wall": null,
+      "log": "results/g_ext/orqa.noise.1e-6.n32.launch.json"
+    },
+    {
+      "id": "monoprop.ki.2e-6.n64",
+      "nodes": 64,
+      "status": "ok",
+      "job": "59768854",
+      "wall": 97.1528335599869,
+      "log": "results/g_ext/monoprop.ki.2e-6.n64.launch.json"
+    },
+    {
+      "id": "monoprop.ki.1e-6.n64",
+      "nodes": 64,
+      "status": "oom",
+      "job": "59768854",
+      "wall": null,
+      "log": "results/g_ext/monoprop.ki.1e-6.n64.launch.json"
+    },
+    {
+      "id": "monoprop.ki.7e-7.n64",
+      "nodes": 64,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.5e-7.n64",
+      "nodes": 64,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.3e-7.n64",
+      "nodes": 64,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.2e-7.n64",
+      "nodes": 64,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.2e-6.n64",
+      "nodes": 64,
+      "status": "ok",
+      "job": "59768854",
+      "wall": 438.656773097,
+      "log": "results/g_ext/orqa.ki.2e-6.n64.launch.json"
+    },
+    {
+      "id": "orqa.ki.1e-6.n64",
+      "nodes": 64,
+      "status": "oom",
+      "job": "59768999",
+      "wall": null,
+      "log": "results/g_ext/orqa.ki.1e-6.n64.launch.json"
+    },
+    {
+      "id": "orqa.ki.7e-7.n64",
+      "nodes": 64,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.5e-7.n64",
+      "nodes": 64,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.3e-7.n64",
+      "nodes": 64,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.2e-7.n64",
+      "nodes": 64,
+      "status": "skipped_after_failure",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.tfim.1e-4.n64",
+      "nodes": 64,
+      "status": "ok",
+      "job": "59768999",
+      "wall": 0.45658612599982007,
+      "log": "results/g_ext/monoprop.tfim.1e-4.n64.launch.json"
+    },
+    {
+      "id": "monoprop.tfim.3e-5.n64",
+      "nodes": 64,
+      "status": "ok",
+      "job": "59768999",
+      "wall": 0.8061054999998305,
+      "log": "results/g_ext/monoprop.tfim.3e-5.n64.launch.json"
+    },
+    {
+      "id": "monoprop.tfim.1e-5.n64",
+      "nodes": 64,
+      "status": "ok",
+      "job": "59768999",
+      "wall": 4.060329792999255,
+      "log": "results/g_ext/monoprop.tfim.1e-5.n64.launch.json"
+    },
+    {
+      "id": "monoprop.tfim.5e-6.n64",
+      "nodes": 64,
+      "status": "ok",
+      "job": "59768999",
+      "wall": 21.16735070499999,
+      "log": "results/g_ext/monoprop.tfim.5e-6.n64.launch.json"
+    },
+    {
+      "id": "monoprop.tfim.3e-6.n64",
+      "nodes": 64,
+      "status": "ok",
+      "job": "59768999",
+      "wall": 63.70004195799993,
+      "log": "results/g_ext/monoprop.tfim.3e-6.n64.launch.json"
+    },
+    {
+      "id": "monoprop.tfim.2e-6.n64",
+      "nodes": 64,
+      "status": "ok",
+      "job": "59768999",
+      "wall": 147.0640992589997,
+      "log": "results/g_ext/monoprop.tfim.2e-6.n64.launch.json"
+    },
+    {
+      "id": "monoprop.tfim.1e-6.n64",
+      "nodes": 64,
+      "status": "oom",
+      "job": "59768999",
+      "wall": null,
+      "log": "results/g_ext/monoprop.tfim.1e-6.n64.launch.json"
+    },
+    {
+      "id": "orqa.tfim.1e-4.n64",
+      "nodes": 64,
+      "status": "ok",
+      "job": "59768999",
+      "wall": 41.887562792,
+      "log": "results/g_ext/orqa.tfim.1e-4.n64.launch.json"
+    },
+    {
+      "id": "orqa.tfim.3e-5.n64",
+      "nodes": 64,
+      "status": "ok",
+      "job": "59768999",
+      "wall": 42.678809538,
+      "log": "results/g_ext/orqa.tfim.3e-5.n64.launch.json"
+    },
+    {
+      "id": "orqa.tfim.1e-5.n64",
+      "nodes": 64,
+      "status": "ok",
+      "job": "59768999",
+      "wall": 55.977904963,
+      "log": "results/g_ext/orqa.tfim.1e-5.n64.launch.json"
+    },
+    {
+      "id": "orqa.tfim.5e-6.n64",
+      "nodes": 64,
+      "status": "ok",
+      "job": "59768999",
+      "wall": 104.824891614,
+      "log": "results/g_ext/orqa.tfim.5e-6.n64.launch.json"
+    },
+    {
+      "id": "orqa.tfim.3e-6.n64",
+      "nodes": 64,
+      "status": "ok",
+      "job": "59768999",
+      "wall": 221.697337559,
+      "log": "results/g_ext/orqa.tfim.3e-6.n64.launch.json"
+    },
+    {
+      "id": "orqa.tfim.2e-6.n64",
+      "nodes": 64,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.tfim.1e-6.n64",
+      "nodes": 64,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.noise.1e-4.n64",
+      "nodes": 64,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.noise.3e-5.n64",
+      "nodes": 64,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.noise.1e-5.n64",
+      "nodes": 64,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.noise.5e-6.n64",
+      "nodes": 64,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.noise.3e-6.n64",
+      "nodes": 64,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.noise.2e-6.n64",
+      "nodes": 64,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.noise.1e-6.n64",
+      "nodes": 64,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.1e-4.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.3e-5.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.1e-5.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.5e-6.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.3e-6.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.2e-6.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.1e-6.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.7e-7.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.5e-7.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.3e-7.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.ki.2e-7.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.1e-4.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.3e-5.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.1e-5.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.5e-6.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.3e-6.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.2e-6.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.1e-6.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.7e-7.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.5e-7.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.3e-7.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.ki.2e-7.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.tfim.1e-4.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.tfim.3e-5.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.tfim.1e-5.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.tfim.5e-6.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.tfim.3e-6.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.tfim.2e-6.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "monoprop.tfim.1e-6.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.tfim.1e-4.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.tfim.3e-5.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.tfim.1e-5.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.tfim.5e-6.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.tfim.3e-6.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.tfim.2e-6.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.tfim.1e-6.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.noise.1e-4.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.noise.3e-5.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.noise.1e-5.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.noise.5e-6.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.noise.3e-6.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.noise.2e-6.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "orqa.noise.1e-6.n128",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "weakS.monoprop.ki.2.4e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "weakS.monoprop.tfim.2.4e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "weakS.orqa.ki.2.4e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "weakS.orqa.tfim.2.4e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "weakS.orqa.noise.2.4e-6.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "weakL.monoprop.ki.8e-7.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "weakL.monoprop.tfim.8e-7.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    },
+    {
+      "id": "weakL.orqa.noise.8e-7.g512",
+      "nodes": 128,
+      "status": "unexecuted",
+      "job": null,
+      "wall": null,
+      "log": null
+    }
+  ],
+  "independent_expectation_checks": [
+    {
+      "id": "i.ref.ki.1e-6.g256",
+      "reference": "logs/s/i.ref.ki.1e-6.g64.out",
+      "difference": 0.0
+    },
+    {
+      "id": "r12.ki.5e-7.g256",
+      "reference": "logs/s/n10.ki.5e-7.g64.out",
+      "difference": 0.0
+    },
+    {
+      "id": "orqa.tfim.1e-4.n8",
+      "reference": "logs/s/n.eng.tfim.1e-4.g128.out",
+      "difference": 3.6060043839825084e-13
+    },
+    {
+      "id": "orqa.tfim.3e-5.n8",
+      "reference": "logs/s/n.eng.tfim.3e-5.g128.out",
+      "difference": 4.373723605510804e-13
+    },
+    {
+      "id": "orqa.tfim.5e-6.n8",
+      "reference": "logs/s/n.eng.tfim.5e-6.g128.out",
+      "difference": 2.922107000813412e-13
+    },
+    {
+      "id": "orqa.noise.1e-4.n8",
+      "reference": "logs/s/n.eng.noise.1e-4.g128.out",
+      "difference": 2.3955837313849315e-13
+    },
+    {
+      "id": "orqa.noise.3e-5.n8",
+      "reference": "logs/s/n.eng.noise.3e-5.g128.out",
+      "difference": 3.3709146585181315e-13
+    },
+    {
+      "id": "orqa.noise.5e-6.n8",
+      "reference": "logs/s/n.eng.noise.5e-6.g128.out",
+      "difference": 3.329836406607001e-13
+    },
+    {
+      "id": "orqa.noise.3e-6.n8",
+      "reference": "logs/s/n.eng.noise.3e-6.g128.out",
+      "difference": 4.658218255571001e-13
+    },
+    {
+      "id": "r12.ki.3e-7.g256",
+      "reference": "logs/s/i12.ki.3e-7.g128.out",
+      "difference": 0.0
+    },
+    {
+      "id": "i.runtime12.tfim.3e-7.g256",
+      "reference": null,
+      "difference": null
+    },
+    {
+      "id": "i.runtime12.noise.3e-7.g256",
+      "reference": null,
+      "difference": null
+    },
+    {
+      "id": "i12.ki.2e-7.g256",
+      "reference": "logs/s/n12.ki.2e-7.g512.out",
+      "difference": 0.0
+    },
+    {
+      "id": "orqa.ki.1e-4.n64",
+      "reference": "logs/s/i.ref.ki.1e-4.g128.out",
+      "difference": 2.2939983246317297e-13
+    },
+    {
+      "id": "orqa.ki.3e-5.n64",
+      "reference": "logs/s/i.ref.ki.3e-5.g128.out",
+      "difference": 2.642885910120185e-13
+    },
+    {
+      "id": "orqa.ki.1e-5.n64",
+      "reference": "logs/s/i.ref.ki.1e-5.g128.out",
+      "difference": 2.851052727237402e-13
+    },
+    {
+      "id": "orqa.ki.5e-6.n64",
+      "reference": "logs/s/n.eng.ki.5e-6.g128.out",
+      "difference": 1.4943601911454607e-13
+    },
+    {
+      "id": "orqa.ki.3e-6.n64",
+      "reference": "logs/s/i.ref.ki.3e-6.g128.out",
+      "difference": 2.7611246622427643e-13
+    },
+    {
+      "id": "weakS.orqa.ki.3.5e-6.g256",
+      "reference": "logs/s/n.weakS.ki.3.5e-6.g256.out",
+      "difference": 4.027889133340068e-13
+    },
+    {
+      "id": "weakS.orqa.tfim.3.5e-6.g256",
+      "reference": "logs/s/n.weakS.tfim.3.5e-6.g256.out",
+      "difference": 4.799494135454552e-13
+    },
+    {
+      "id": "weakS.orqa.noise.3.5e-6.g256",
+      "reference": null,
+      "difference": null
+    },
+    {
+      "id": "weakL.orqa.noise.1.15e-6.g256",
+      "reference": "logs/s/n.weakL.noise.1.15e-6.g256.out",
+      "difference": 2.91627832993413e-13
+    },
+    {
+      "id": "orqa.ki.2e-6.n64",
+      "reference": "logs/s/n.eng.ki.2e-6.g128.out",
+      "difference": 3.6648462042876417e-13
+    },
+    {
+      "id": "i.ref.ki.1e-6.g64",
+      "reference": "logs/s/i.ref.ki.1e-6.g256.out",
+      "difference": 0.0
+    },
+    {
+      "id": "weakL.orqa.noise.1.6e-6.g128",
+      "reference": "logs/s/n.weakL.noise.1.6e-6.g128.out",
+      "difference": 2.0175527915000657e-13
+    },
+    {
+      "id": "orqa.tfim.2e-6.n32",
+      "reference": "logs/s/n.eng.tfim.2e-6.g128.out",
+      "difference": 1.8351986597053838e-13
+    },
+    {
+      "id": "orqa.noise.1e-4.n32",
+      "reference": "logs/s/n.eng.noise.1e-4.g128.out",
+      "difference": 2.395306175628775e-13
+    },
+    {
+      "id": "orqa.noise.3e-5.n32",
+      "reference": "logs/s/n.eng.noise.3e-5.g128.out",
+      "difference": 3.3717473257866004e-13
+    },
+    {
+      "id": "orqa.noise.1e-5.n32",
+      "reference": "logs/s/n.eng.noise.1e-5.g128.out",
+      "difference": 1.120215031846783e-13
+    },
+    {
+      "id": "orqa.noise.5e-6.n32",
+      "reference": "logs/s/n.eng.noise.5e-6.g128.out",
+      "difference": 3.329836406607001e-13
+    },
+    {
+      "id": "i.runtime10.tfim.5e-7.g64",
+      "reference": null,
+      "difference": null
+    },
+    {
+      "id": "orqa.noise.3e-6.n32",
+      "reference": "logs/s/n.eng.noise.3e-6.g128.out",
+      "difference": 4.658495811327157e-13
+    },
+    {
+      "id": "i.runtime10.noise.5e-7.g64",
+      "reference": null,
+      "difference": null
+    },
+    {
+      "id": "orqa.noise.2e-6.n32",
+      "reference": "logs/s/n.eng.noise.2e-6.g128.out",
+      "difference": 3.2923663795259017e-13
+    },
+    {
+      "id": "weakS.orqa.ki.7.1e-6.g64",
+      "reference": "logs/s/n.weakS.ki.7.1e-6.g64.out",
+      "difference": 2.345901251032956e-13
+    },
+    {
+      "id": "weakS.orqa.tfim.7.1e-6.g64",
+      "reference": "logs/s/n.weakS.tfim.7.1e-6.g64.out",
+      "difference": 3.291811268013589e-13
+    },
+    {
+      "id": "weakS.orqa.noise.7.1e-6.g64",
+      "reference": "logs/s/n.weakS.noise.7.1e-6.g64.out",
+      "difference": 1.1823875212257917e-13
+    },
+    {
+      "id": "orqa.ki.3e-6.n32",
+      "reference": "logs/s/i.ref.ki.3e-6.g128.out",
+      "difference": 2.7611246622427643e-13
+    },
+    {
+      "id": "weakL.orqa.noise.2.3e-6.g64",
+      "reference": "logs/s/n.weakL.noise.2.3e-6.g64.out",
+      "difference": 3.2085445411667024e-13
+    },
+    {
+      "id": "orqa.tfim.1e-4.n16",
+      "reference": "logs/s/n.eng.tfim.1e-4.g128.out",
+      "difference": 3.606559495494821e-13
+    },
+    {
+      "id": "orqa.tfim.3e-5.n16",
+      "reference": "logs/s/n.eng.tfim.3e-5.g128.out",
+      "difference": 4.373723605510804e-13
+    },
+    {
+      "id": "orqa.tfim.1e-5.n16",
+      "reference": "logs/s/n.eng.tfim.1e-5.g128.out",
+      "difference": 1.3444800828210646e-13
+    },
+    {
+      "id": "orqa.tfim.5e-6.n16",
+      "reference": "logs/s/n.eng.tfim.5e-6.g128.out",
+      "difference": 2.922107000813412e-13
+    },
+    {
+      "id": "orqa.tfim.3e-6.n16",
+      "reference": "logs/s/n.eng.tfim.3e-6.g128.out",
+      "difference": 2.9543034685275416e-13
+    },
+    {
+      "id": "orqa.noise.1e-4.n16",
+      "reference": "logs/s/n.eng.noise.1e-4.g128.out",
+      "difference": 2.395306175628775e-13
+    },
+    {
+      "id": "orqa.noise.3e-5.n16",
+      "reference": "logs/s/n.eng.noise.3e-5.g128.out",
+      "difference": 3.371469770030444e-13
+    },
+    {
+      "id": "orqa.noise.1e-5.n16",
+      "reference": "logs/s/n.eng.noise.1e-5.g128.out",
+      "difference": 1.1191048088221578e-13
+    },
+    {
+      "id": "orqa.noise.5e-6.n16",
+      "reference": "logs/s/n.eng.noise.5e-6.g128.out",
+      "difference": 3.329281295094688e-13
+    },
+    {
+      "id": "orqa.noise.3e-6.n16",
+      "reference": "logs/s/n.eng.noise.3e-6.g128.out",
+      "difference": 4.659050922839469e-13
+    },
+    {
+      "id": "orqa.noise.2e-6.n16",
+      "reference": "logs/s/n.eng.noise.2e-6.g128.out",
+      "difference": 3.292643935282058e-13
+    },
+    {
+      "id": "orqa.tfim.1e-4.n64",
+      "reference": "logs/s/n.eng.tfim.1e-4.g128.out",
+      "difference": 3.6060043839825084e-13
+    },
+    {
+      "id": "orqa.tfim.3e-5.n64",
+      "reference": "logs/s/n.eng.tfim.3e-5.g128.out",
+      "difference": 4.373723605510804e-13
+    },
+    {
+      "id": "orqa.tfim.1e-5.n64",
+      "reference": "logs/s/n.eng.tfim.1e-5.g128.out",
+      "difference": 1.3444800828210646e-13
+    },
+    {
+      "id": "orqa.tfim.5e-6.n64",
+      "reference": "logs/s/n.eng.tfim.5e-6.g128.out",
+      "difference": 2.922107000813412e-13
+    },
+    {
+      "id": "orqa.tfim.3e-6.n64",
+      "reference": "logs/s/n.eng.tfim.3e-6.g128.out",
+      "difference": 2.9543034685275416e-13
+    },
+    {
+      "id": "cupp.tfim.1e-4.g512",
+      "reference": "logs/s/n.eng.tfim.1e-4.g128.out",
+      "difference": 0.0
+    },
+    {
+      "id": "cupp.tfim.3e-5.g512",
+      "reference": "logs/s/n.eng.tfim.3e-5.g128.out",
+      "difference": 0.0
+    },
+    {
+      "id": "cupp.tfim.1e-5.g512",
+      "reference": "logs/s/n.eng.tfim.1e-5.g128.out",
+      "difference": 0.0
+    },
+    {
+      "id": "cupp.tfim.5e-6.g512",
+      "reference": "logs/s/n.eng.tfim.5e-6.g128.out",
+      "difference": 0.0
+    },
+    {
+      "id": "cupp.tfim.3e-6.g512",
+      "reference": "logs/s/n.eng.tfim.3e-6.g128.out",
+      "difference": 0.0
+    },
+    {
+      "id": "cupp.tfim.2e-6.g512",
+      "reference": "logs/s/n.eng.tfim.2e-6.g128.out",
+      "difference": 0.0
+    },
+    {
+      "id": "cupp.noise.1e-4.g512",
+      "reference": "logs/s/n.eng.noise.1e-4.g128.out",
+      "difference": 0.0
+    },
+    {
+      "id": "cupp.noise.3e-5.g512",
+      "reference": "logs/s/n.eng.noise.3e-5.g128.out",
+      "difference": 0.0
+    },
+    {
+      "id": "cupp.noise.1e-5.g512",
+      "reference": "logs/s/n.eng.noise.1e-5.g128.out",
+      "difference": 0.0
+    },
+    {
+      "id": "cupp.noise.5e-6.g512",
+      "reference": "logs/s/n.eng.noise.5e-6.g128.out",
+      "difference": 0.0
+    }
+  ],
+  "notes": [
+    "MonoProp uses native truncation; its expectations are not matched-rule results.",
+    "Frame-input cuPauliProp is not the primary original-circuit baseline.",
+    "Unexecuted entries are not claimed to be queued.",
+    "Skipped and predicted entries contain no measured failure or time."
+  ]
+}

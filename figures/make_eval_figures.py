@@ -351,6 +351,10 @@ def scale_rec(*ids):
             continue
         if r.get("status") in ("skipped_after_failure", "predicted_oom", "predicted_tl", "superseded"):
             continue
+        # Some adapters write a solver result before MPI teardown hangs.
+        # Preserve its queue record but do not plot a failed process as success.
+        if r.get("status") == "ok" and r.get("exit") not in (None, 0):
+            return dict(r, status="result_exit_nonzero", wall=None)
         return r
     return None
 

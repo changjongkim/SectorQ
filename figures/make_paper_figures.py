@@ -649,6 +649,10 @@ def ev_circuits128():
             label.remove()
         lo, hi = ax.get_ylim()
         ax.set_yticks([y for y in (1, 10, 100, 1000, 10000) if lo <= y <= hi])
+    for leg in fig.legends:
+        for label in leg.get_texts():
+            if label.get_text().startswith("N×:"):
+                label.set_text("")
     split(fig, "ev_circuits128", 3, size=(PLACE[3][0], 2.3))
 
 
