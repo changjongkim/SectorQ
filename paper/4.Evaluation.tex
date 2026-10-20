@@ -105,9 +105,9 @@ At the largest setting completed by the primary baseline in each sweep, \SectorQ
 For kicked Ising at cutoff $5\times10^{-6}$, the times are about 7.6 and 101.6~s.
 The CPU comparisons use the same 32 nodes.
 MonoProp remains competitive at the smallest settings, subject to its different truncation rule.
-Additional CPU cutoff sweeps remain incomplete, and their curves end at the last completed measurement.
-The completed GPU comparisons retain a time advantage at 128 GPUs, including a 13.4-fold reduction for the specified kicked Ising input.
-% TBD: append completed CPU ladders from job 59768998.
+At the largest shared cutoffs completed by the ORQA reproduction, \SectorQ is 19.2-21.7 times faster.
+These cutoffs are $3\times10^{-6}$ for kicked Ising and $2\times10^{-6}$ for TFIM and noisy kicked Ising.
+The next ORQA setting exhausts memory for kicked Ising and its noisy variant, while the next TFIM setting is excluded by the time estimate.
 
 \begin{figure}[t]
 \centering
@@ -150,11 +150,12 @@ We vary the GPU count, circuit dimensions, and retained operator size to disting
 For fixed large problems, \SectorQ achieves speedups of 81-166 on 256 GPUs and 83-180 on 512 GPUs relative to one GPU.
 The representative settings are kicked Ising at cutoff $3\times10^{-6}$ and heavy-hex TFIM and noisy kicked Ising at $5\times10^{-6}$.
 Figure~\ref{fig:scaleout} also shows the kicked Ising cutoff ladder from one to 512 GPUs.
+From 32 GPUs onward, its capacity measurements at cutoffs $10^{-6}$ and below use higher sector caps and, on 128 GPUs onward, smaller chunks.
 The default cap of 256 sectors limits additional speedup beyond 256 GPUs.
 At kicked Ising cutoff $3\times10^{-6}$, time decreases from 10.48 to 9.67~s.
 The trace contains at most 256 nonempty sectors and no GPU splits, leaving fewer concurrent tasks than the 512 available workers.
-At cutoff $10^{-5}$, execution time remains near three seconds from 128 GPUs onward.
-Additional GPUs cannot reduce this time proportionally when the sector count and per-window fixed costs limit parallel execution.
+On 512 GPUs, TFIM at cutoff $2\times10^{-6}$ takes 20.7~s with \SectorQ and 201.2~s with original-circuit \cuPP.
+The next \cuPP setting, $10^{-6}$, exhausts GPU memory.
 
 \begin{figure}[t]
 \centering
@@ -171,9 +172,11 @@ For the large load, \SectorQ retains 80-88\% of this throughput on 16 GPUs and 7
 The range falls to 23-38\% on 512 GPUs under the default sector cap.
 The measured large-load \cuPP configurations exhaust GPU memory, whereas the small load permits time comparisons between both systems.
 On 16 GPUs, \SectorQ is 8.1-12 times faster than the original-circuit baseline for the small load.
-CPU results appear at completed configurations.
+On the same 64 nodes as the 256-GPU configuration, the ORQA reproduction takes 15.8-19.1 times longer for the small load.
+MonoProp takes 3.6 and 5.0 times longer for kicked Ising and TFIM, respectively, under its different truncation rule.
+The 512-GPU CPU and weak-load baseline configurations remain unexecuted.
 The retained population increases with GPU count, but throughput per GPU decreases at the largest configurations under the default sector cap.
-% TBD: remaining CPU and 512-GPU baseline weak points from the fill campaign.
+% Remaining: 512-GPU CPU and weak-load baseline points need a new allocation.
 
 \begin{figure}[t]
 \centering
@@ -213,12 +216,12 @@ The kicked Ising capacity sweep reaches 448.2 billion boundary terms on 512 GPUs
 The 17.9~TB expansion is 140 times larger than the largest completed original-circuit \cuPP setting on the same GPUs, 3.2 billion terms at $2\times10^{-6}$.
 The host chunk pool occupies 21,079~GiB across 128 nodes, 64\% of installed host memory.
 This allocation includes reusable chunks and transient storage and excludes memory outside the chunk pool.
-Round-based exchange limits additional receive storage, and each sector must still admit a finer valid partition if its working set exceeds GPU memory.
 On 128 GPUs, \SectorQ completes 117.5 billion terms.
-The 256-GPU endpoint remains under remeasurement after a stalled run.
+On 256 GPUs, the completed endpoint is 257.3 billion terms at cutoff $2\times10^{-7}$ in 3,382~s.
+Its host chunk pool occupies 11,490~GiB across 64 nodes, or 70\% of installed host memory.
+Both CPU baselines on those 64 nodes complete kicked Ising at $2\times10^{-6}$ and exhaust memory at $10^{-6}$.
 Configurations rejected from estimated storage requirements remain distinct from measured failures.
-The 140-fold capacity ratio compares completed \SectorQ and \cuPP runs on the same GPUs.
-% TBD: 256-GPU endpoint and CPU reach from jobs 59768854 and the fill campaign.
+% Remaining: the 256-GPU ORQA TFIM/noise ladders and 512-GPU CPU reach are incomplete.
 
 \subsection{Contribution of the Design Choices}
 \label{sec:design-eval}
@@ -309,13 +312,15 @@ The capacity configurations are marked with asterisks, and parentheses denote bo
 Worker times are averaged over GPUs, exchange and synchronization times over nodes, and each is normalized by wall time.
 The Other component is the residual wall time after these recorded components.
 The library-call component measures elapsed call time and does not represent sampled device utilization.
-On 64 GPUs, kicked Ising reaches 44.3 billion boundary terms at the largest point, with 0.7\% average worker idle time.
-Five capacity measurements remain pending, including kicked Ising on 256 GPUs and TFIM and noisy kicked Ising on both larger allocations.
-These points have no measured time shares or term counts.
+All 27 profiles are complete.
+The largest 64-GPU points contain 14.9-78.5 billion boundary terms, and the largest 256-GPU points contain 37.3-212.6 billion.
+Average worker idle time is below 1\% at all six capacity points.
+The larger inputs sustain worker activity, although exchange and transfer costs remain.
 
 \noindent\textbf{Concurrency and Exchange Costs.}
 The small reference spends 37-52\% of wall time in average worker idle time across the nine profiles.
-At the largest 16-GPU settings, library operations occupy 70-89\% of wall time and inter-node exchange occupies 3-13\%.
+At the largest 16-GPU settings, library operations occupy 76-89\% of wall time and inter-node exchange occupies 3-7\%.
+At the largest 256-GPU points, exchange occupies 10-35\%, with TFIM at the upper end.
 The original-circuit \cuPP baseline separately records 39-44\% of its large-setting time inside MPI calls.
 The separate 512-GPU measurements show that average worker idle time rises from 9\% to 40\% of wall time relative to 256 GPUs at kicked Ising cutoff $3\times10^{-6}$.
 The largest capacity run uses a higher sector cap and has a different composition, with 46\% in library calls, 26\% in exchange, and 9\% in GPU-host copies.
