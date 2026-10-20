@@ -1,24 +1,25 @@
 {
-  "version": 1,
-  "status": "queued_regular_pending_gpu_validation",
+  "version": 2,
+  "status": "ready_correctness_then_confirmatory",
   "execution": {
     "implementation_commit": "349a73e",
     "runner": "jobs/n2_count.sh",
     "reader": "analysis/paper_n2count.py",
-    "preflight_runs": {"warmup": 1, "legacy_compatibility": 14, "matched_stream_input_check": 7},
+    "preflight_runs": {"warmup": 1, "legacy_compatibility": 14, "all_policy_correctness": 42},
     "local_checks": "count-control C++ tests, five analysis rejection tests, and 105 actual engine window-selection cases over seven circuits passed; new binary built; existing binary hashes unchanged",
     "latest_request_utc": "2026-10-16T08:51:34Z",
-    "job_id": "59846258",
+    "previous_job_id": "59846258",
+    "job_id": null,
     "qos": "regular",
     "batch_script": "jobs/n2_count_batch.sh",
-    "submission_source_commit": "14aaa3da296bdb1c17c0b4ba0cce91d6b5c7ee68",
-    "submission_receipt": "logs/n2count/submission.59846258.json",
-    "scheduler_state_at_submission": "PENDING (Priority)",
+    "submission_source_commit": null,
+    "submission_receipt": null,
+    "scheduler_state_at_submission": "replacement_not_submitted",
     "allocation": null,
     "previous_interactive_failure": "QOSMaxSubmitJobPerUserLimit; interactive MaxSubmitJobsPU=2, both occupied by non-pp_ jobs",
     "gpu_validation": "not_started",
-    "pilot": "not_started",
-    "log": "logs/n2count/batch-59846258.out"
+    "pilot": "superseded_not_run",
+    "log": null
   },
   "purpose": "Test whether online sector-count adaptation reduces end-to-end time relative to fixed granularity, including the fastest tested fixed setting for each workload.",
   "claim_boundary": "This isolates sector-count adaptation. It does not establish that eight-candidate competition is a major speedup or independently establish novelty.",
@@ -80,6 +81,7 @@
     "Verify fixed counts activate as specified and that all policies preserve window boundaries, truncation positions and answers. Record differences caused by unavoidable numerical effects rather than hiding them."
   ],
   "pilot": {
+    "superseded": true,
     "circuits": ["ki", "tfim", "xxz"],
     "selection_reason": "Predeclared representatives: standard KI, a different interaction graph, and the largest measured term population with stronger sector imbalance. All seven circuits remain in the confirmatory matrix.",
     "cutoffs": ["1e-4", "3e-6"],
@@ -90,7 +92,27 @@
     "maximum_allocations_before_review": 1,
     "allocation_wall_hours": 4,
     "not_for_confirmatory_speedup_claims": true,
-    "decision": "Audit count activation, correctness, total time, splits and phase timing. If the adaptive policy has no useful end-to-end benefit even against a fixed 16-label control, stop the large matrix and report the negative result. If it only beats an untuned constant, retain the per-workload best-fixed comparison and restrict the claim to tuning avoidance, subject to confirmatory results."
+    "decision": "Not executed. Replaced by correctness-only validation followed directly by the predeclared confirmatory matrix, regardless of measured speedup."
+  },
+  "validation": {
+    "circuits": ["ki", "tfim", "noise", "tfimsq", "xxz", "qaoa", "hea"],
+    "cutoff": "1e-4",
+    "policy_seed": 7,
+    "policies": ["adaptive", "fixed16", "fixed32", "fixed64", "fixed128", "fixed256"],
+    "measured_runs": 42,
+    "gate": "All six policies must complete and preserve expectation, window schedule, shared bootstrap and prescribed count semantics. Compare the matched adaptive answer with the legacy reference. Do not gate continuation on timings or speedup.",
+    "reuse_as_confirmatory": false
+  },
+  "execution_flow": {
+    "nodes_per_allocation": 4,
+    "allocation_wall_hours": 4,
+    "max_allocations": 8,
+    "automatic_continuation": true,
+    "maximum_reserved_node_hours": 128,
+    "sequence": "One warmup, seven legacy pairs, and seven all-policy correctness blocks on each allocation, followed immediately by remaining confirmatory blocks.",
+    "continuation": "Submit at most one four-node regular successor with afterany dependency on the current allocation after a normal time-budget exit. Retain one global loop lock and one allocation lock. Stop on correctness errors, source/hash mismatches, submission ambiguity, or the allocation limit.",
+    "resume": "Skip only six-member confirmatory blocks already fully attempted in one allocation. Preserve failures as outcomes. Remeasure all six members of partial blocks together; never merge partial blocks across allocations.",
+    "performance_gate": false
   },
   "confirmatory": {
     "circuits": ["ki", "tfim", "noise", "tfimsq", "xxz", "qaoa", "hea"],
@@ -100,15 +122,15 @@
     "repetitions_per_seed": 1,
     "measured_runs": 630,
     "uncertainty_scope": "Five paired blocks vary policy randomness and execution noise together; do not describe this as five timing repeats at one policy seed or cross-allocation robustness.",
-    "ordering": "For each circuit/cutoff/seed block, randomize the six policy executions with a logged schedule seed. Keep the full block on the same allocation and warm each node's GPU/library path before measurement.",
+    "ordering": "For each policy seed, deterministically shuffle all 21 workloads, then shuffle the six policies in each workload using the logged schedule seed and block key. Keep the full block on the same allocation and warm each node's GPU/library path before measurement.",
     "pilot_reuse": false,
     "controls_remeasured": true,
     "allocation_wall_hours": 4,
     "loops_per_allocation": 1,
     "baseline_only_time_estimate_hours": 6.4602,
-    "time_estimate_caveat": "This is 775.22 seconds for the 21 existing adaptive runs times 6 policies times 5 blocks. It excludes warmup, launches and all static-policy slowdowns. Size the remaining campaign using the pilot, never promise completion in one allocation.",
+    "time_estimate_caveat": "This is 775.22 seconds for the 21 existing adaptive runs times 6 policies times 5 blocks. It excludes warmup, launches and all static-policy slowdowns. Use prior adaptive times and observed full-block timings for admission. Completion in one four-hour allocation is not expected.",
     "per_run_timeout_seconds": 1800,
-    "allocation_end_policy": "Do not begin a matched block unless its pilot-based budget fits with a cleanup reserve. Preserve partial blocks as incomplete and remeasure all six members together if a replacement block is needed. Do not combine a new control with an old allocation's variant."
+    "allocation_end_policy": "Admit whole blocks using prior and observed times with a cleanup reserve. Preserve partial blocks as incomplete and remeasure all six members together in a dependent continuation. Do not combine a new control with an old allocation's variant."
   },
   "measurements": {
     "primary": ["solver wall time", "successful completion", "expectation agreement"],

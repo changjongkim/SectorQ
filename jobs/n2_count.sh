@@ -1,5 +1,5 @@
 #!/bin/bash
-# One finite pilot campaign, one loop and one srun per fresh four-node allocation.
+# Correctness gates then the full matrix, one loop/srun per four-node allocation.
 set -euo pipefail
 source /pscratch/sd/s/sgkim/kcj/pauliprop/jobs/env.sh
 cd "$PP_ROOT"

@@ -18,4 +18,5 @@ cd /pscratch/sd/s/sgkim/kcj/pauliprop
 exec bash jobs/n2_count.sh --batch \
     --source-commit "${PP_N2_SOURCE_COMMIT:?submission commit required}" \
     --binary-sha256 "${PP_N2_BINARY_SHA256:?experiment hash required}" \
-    --reference-sha256 "${PP_N2_REFERENCE_SHA256:?reference hash required}"
+    --reference-sha256 "${PP_N2_REFERENCE_SHA256:?reference hash required}" \
+    --campaign "${PP_N2_CAMPAIGN:?stable campaign identifier required}"

@@ -20,11 +20,22 @@ def read_run(path):
         raise ValueError('missing provenance: ' + str(path))
     meta = json.loads(first[len('# count_run '):])
     row = parse_log(path)
+    exit_match = re.search(r'^exit=(-?\d+)\s*$', text, re.M)
+    if exit_match:
+        row['exit'] = int(exit_match.group(1))
     row['meta'] = meta
     row['schedule'] = re.findall(r'^trace window=(\d+) ops=(\d+)\.\.(\d+)', text, re.M)
     row['audit'] = [dict(re.findall(r'(\w+)=([^\s]+)', line))
                     for line in text.splitlines() if line.startswith('count_policy ')]
     row['status'] = 'incomplete' if row['exit'] is None else 'failed'
+    row['failure_reason'] = None
+    if row['status'] == 'failed':
+        if re.search(r'out.of.memory|bad_alloc|oom.kill|host allocation failed', text, re.I):
+            row['failure_reason'] = 'oom'
+        elif row['exit'] in (124, 137):
+            row['failure_reason'] = 'timeout_or_kill'
+        else:
+            row['failure_reason'] = 'process_error'
     if row['exit'] == 0:
         valid = (row['wall'] is not None and row['wall'] > 0 and math.isfinite(row['wall'])
                  and row['expectation'] is not None and math.isfinite(row['expectation'])
@@ -98,6 +109,9 @@ def check_block(rows):
         for key in keys:
             if r['meta'][key] != base['meta'][key]:
                 raise ValueError('block provenance mismatch: ' + key)
+        for key in ('source_commit', 'campaign'):
+            if r['meta'].get(key) != base['meta'].get(key):
+                raise ValueError('block provenance mismatch: ' + key)
         # The only changed input flag must be the fixed-sector count.
         def opts(x):
             args = x['meta']['args']
@@ -120,7 +134,7 @@ def check_block(rows):
                     raise ValueError('bootstrap population mismatch: ' + key)
         if activation < len(r['audit']) and int(base['audit'][activation]['adaptive_next_rows']) < 4:
             raise ValueError('adaptive reference lacks bootstrap activation')
-    return dict(circuit=base['meta']['circuit'], cutoff=base['meta']['cutoff'],
+    return dict(phase=base['meta']['phase'], circuit=base['meta']['circuit'], cutoff=base['meta']['cutoff'],
                 policy_seed=base['meta']['policy_seed'], activation_window=first_fixed,
                 wall={k: by[k]['wall'] for k in POLICIES},
                 reference_over_adaptive={k: by[k]['wall'] / base['wall'] for k in POLICIES[1:]})
@@ -128,11 +142,15 @@ def check_block(rows):
 
 def summarize(directory):
     rows = [read_run(p) for p in sorted(Path(directory).glob('*.out'))]
+    return summarize_rows(rows)
+
+
+def summarize_rows(rows):
     groups = {}
     for r in rows:
         m = r['meta']
-        if m['phase'] == 'pilot':
-            groups.setdefault((m['circuit'], m['cutoff'], m['policy_seed']), []).append(r)
+        if m['phase'] in ('pilot', 'validation', 'confirmatory'):
+            groups.setdefault((m['phase'], m['circuit'], m['cutoff'], m['policy_seed']), []).append(r)
     blocks = []
     for key, group in sorted(groups.items()):
         if len(group) == 6 and all(r['status'] == 'complete' for r in group):
@@ -141,7 +159,21 @@ def summarize(directory):
             except ValueError as e:
                 blocks.append(dict(status='invalid', key=key, error=str(e)))
         else:
-            blocks.append(dict(status='incomplete', key=key,
+            status = 'incomplete'
+            error = None
+            if any(r['status'] == 'invalid' for r in group):
+                status = 'invalid'
+            elif len(group) == 6 and all(r['status'] in ('complete', 'failed') for r in group):
+                # A measured failure is a result, not a reason to retry until it wins.
+                status = 'failed'
+                successful = [r for r in group if r['status'] == 'complete']
+                try:
+                    for row in successful[1:]:
+                        check_answers(successful[0], row)
+                except ValueError as exc:
+                    status, error = 'invalid', str(exc)
+            blocks.append(dict(status=status, key=key, phase=key[0], circuit=key[1],
+                               cutoff=key[2], policy_seed=key[3], error=error,
                                run_statuses=dict(Counter(r['status'] for r in group))))
     return dict(rows=rows, blocks=blocks)
 
@@ -157,6 +189,7 @@ def main():
     result = summarize(directory)
     print('Runs:', dict(Counter(r['status'] for r in result['rows'])))
     print('Pilot runs:', dict(Counter(r['status'] for r in result['rows'] if r['meta']['phase'] == 'pilot')))
+    print('Confirmatory runs:', dict(Counter(r['status'] for r in result['rows'] if r['meta']['phase'] == 'confirmatory')))
     for block in result['blocks']:
         print(json.dumps(block, sort_keys=True))
     if args.write:
