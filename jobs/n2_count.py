@@ -322,7 +322,9 @@ def main():
         for circuit in CIRCUITS:
             old = run('compat', circuit, '1e-4', 'old', limit=180)
             legacy = run('compat', circuit, '1e-4', 'legacy', limit=180)
-            check_compat(old, legacy)
+            compatibility = check_compat(old, legacy)
+            atomic_json(directory / ('compatibility.' + circuit + '.json'), compatibility)
+            say('compatibility diagnostics ' + circuit + ': ' + json.dumps(compatibility, sort_keys=True))
             validation = [run('validation', circuit, '1e-4', policy, limit=180) for policy in POLICIES]
             matched = validation[0]
             check_answers(old, matched)

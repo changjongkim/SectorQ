@@ -103,6 +103,7 @@
     "policies": ["adaptive", "fixed16", "fixed32", "fixed64", "fixed128", "fixed256"],
     "measured_runs": 42,
     "gate": "All six policies must complete and preserve expectation, window schedule, shared bootstrap and prescribed count semantics. Compare the matched adaptive answer with the legacy reference. Do not gate continuation on timings or speedup.",
+    "legacy_compatibility_gate": "Require identical arguments, allocation, window boundaries, row-count traces, total term populations and nonempty sector counts, with expectation difference at most 1e-9. Preserve largest-sector population differences as diagnostics: stride samples depend on concurrent host-chunk ordering, so those populations are not exact legacy compatibility invariants. The all-policy bootstrap checks remain unchanged.",
     "reuse_as_confirmatory": false
   },
   "execution_flow": {

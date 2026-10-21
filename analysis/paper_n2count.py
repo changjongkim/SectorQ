@@ -90,10 +90,24 @@ def check_compat(a, b):
     check_answers(a, b)
     if a['meta']['allocation'] != b['meta']['allocation']:
         raise ValueError('compatibility controls from different allocations')
+    if a['meta']['args'] != b['meta']['args']:
+        raise ValueError('compatibility controls have different arguments')
+    if len(a['trace']) != len(b['trace']):
+        raise ValueError('legacy trace length mismatch')
+    diagnostics = []
     for x, y in zip(a['trace'], b['trace']):
-        for key in ('rows', 'next_rows', 'terms_in', 'terms_out', 'sectors', 'largest_sector_in'):
+        for key in ('rows', 'next_rows', 'terms_in', 'terms_out', 'sectors'):
             if x[key] != y[key]:
                 raise ValueError('legacy trace mismatch: ' + key)
+        # Worker completion order changes host-chunk order. Stride sampling of
+        # those chunks can select different row candidates even with the same
+        # RNG seed. Largest-sector population is a diagnostic, not an exact
+        # compatibility invariant. Keep strict bootstrap checks in check_block.
+        if x['largest_sector_in'] != y['largest_sector_in']:
+            diagnostics.append(dict(window=x['window'],
+                                    old_largest_sector_in=x['largest_sector_in'],
+                                    legacy_largest_sector_in=y['largest_sector_in']))
+    return dict(largest_sector_differences=diagnostics)
 
 
 def check_block(rows):

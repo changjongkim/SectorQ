@@ -78,6 +78,27 @@ class AuditTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             check_block(rows)
 
+    def test_compat_retains_sample_dependent_population_diagnostics(self):
+        a = row('adaptive'); b = copy.deepcopy(a)
+        b['trace'][1]['largest_sector_in'] += 1
+        result = check_compat(a, b)
+        self.assertEqual(result['largest_sector_differences'], [dict(
+            window=1, old_largest_sector_in=10, legacy_largest_sector_in=11)])
+        for key in ('rows', 'next_rows', 'terms_in', 'terms_out', 'sectors'):
+            changed = copy.deepcopy(b)
+            changed['trace'][1][key] += 1
+            with self.assertRaises(ValueError):
+                check_compat(a, changed)
+        b['meta']['args'] = ['--seed', '8']
+        with self.assertRaises(ValueError):
+            check_compat(a, b)
+
+    def test_bootstrap_population_is_still_strict(self):
+        rows = [row(p) for p in POLICIES]
+        rows[-1]['trace'][0]['largest_sector_in'] += 1
+        with self.assertRaises(ValueError):
+            check_block(rows)
+
 
 if __name__ == '__main__':
     unittest.main()
