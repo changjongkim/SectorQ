@@ -32,7 +32,8 @@ import make_eval_figures as mf                      # noqa: E402
 import make_deck_figures as md                      # noqa: E402
 import make_prs_figure as mp                        # noqa: E402
 
-OUT = os.path.join(os.path.dirname(HERE), "paper", "figures")
+PAPER_DIR = os.environ.get("SECTORQ_PAPER_DIR", os.path.join(os.path.dirname(HERE), "paper"))
+OUT = os.path.join(PAPER_DIR, "figures")
 os.makedirs(OUT, exist_ok=True)
 SCALE = 0.6                                         # \includegraphics[scale=0.6] for every file of this script
 TEXT_W = 5.48 / SCALE                               # the text width of acmsmall (395.8 pt) on the canvas

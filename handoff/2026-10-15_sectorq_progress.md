@@ -2,6 +2,12 @@
 
 이 파일은 `2026-10-14_sectorq_handoff.md`의 후속 기록이다. 원래 0절 규칙을 유지한다. 모든 쓰기는 kcj 안에서, 우리 `pp_` job만, 새 8노드 이상 job은 사용자 승인 뒤, 할당 하나에 loop 하나. push는 요청이 있을 때만 한다.
 
+## 원고 작업 경로 변경 — 2026-10-21
+
+사용자가 Overleaf 연동 저장소 `changjongkim/SectorQ_Paper`를 앞으로의 논문 관리 저장소로 지정했다. **원고의 기준 경로는 `/pscratch/sd/s/sgkim/kcj/SectorQ_Paper`이며, 이후 원고 편집/commit/pull/push는 그곳에서 한다.** 아래 과거 기록의 `pauliprop/paper`는 이관 시점 보관본이다. 최신 PDF 링크는 https://github.com/changjongkim/SectorQ_Paper/blob/main/main.pdf 로 바뀐다. 새 저장소의 AGENTS.md/README.md를 따른다.
+
+125개 추적 원고 파일을 루트로 이관했고, 설계/데이터 그림과 본문은 바이트 단위로 동일하다. 새 경로의 build/style 검증은 24쪽, 본문 8,572단어(Evaluation 3,167), style 0건, TeX 오류/미해결 참조/Overfull 0건이다. 재빌드 PDF와 build/main.pdf가 일치하며 첫 페이지/평가 페이지를 렌더 확인했다. 연구/실험 코드는 기존 저장소에서 관리한다. 새 원고의 `scripts/update_data_figures.sh <그림 이름>`이 연구 생성기에 `SECTORQ_PAPER_DIR`을 전달하여 출력만 새 저장소로 보낸다. 그림을 새로 생성하지 않았다. 연구 repo 로컬 Git alias `git paper <명령>`도 새 논문 repo를 가리킨다. SSH/Git 신원 및 ff-only pull은 새 repo 로컬 설정만 변경했다.
+
 ## 이번 턴의 결과
 
 - 인계된 변경을 먼저 커밋했다: `15b6a6f`(승인된 설계 그림/절 구성), `0c6f3bc`(고정 행 실험 재개기).
