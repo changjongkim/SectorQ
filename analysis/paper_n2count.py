@@ -117,6 +117,7 @@ def check_block(rows):
     base = by['adaptive']
     keys = ('allocation', 'binary_sha256', 'circuit', 'cutoff', 'policy_seed', 'phase')
     first_fixed = None
+    sampled = []
     for name in POLICIES:
         r = by[name]
         check_answers(base, r)
@@ -140,16 +141,25 @@ def check_block(rows):
         elif first_fixed != activation:
             raise ValueError('different bootstrap activation windows')
         # The current window is still shared when the *next* count first changes.
+        # As in check_compat: the row count, sector count and term populations are
+        # exact invariants. The row choice (row_hash) and the largest sector depend on
+        # the stride sample of host chunks, whose order follows worker completion, so
+        # they are recorded as diagnostics (job 60072320: hea at 1e-4 differed only there).
         for i in range(min(activation + 1, len(r['audit']))):
-            if r['audit'][i]['row_hash'] != base['audit'][i]['row_hash']:
-                raise ValueError('bootstrap row hash mismatch')
-            for key in ('rows', 'terms_in', 'terms_out', 'sectors', 'largest_sector_in'):
+            for key in ('rows', 'terms_in', 'terms_out', 'sectors'):
                 if r['trace'][i][key] != base['trace'][i][key]:
                     raise ValueError('bootstrap population mismatch: ' + key)
+            if (r['audit'][i]['row_hash'] != base['audit'][i]['row_hash']
+                    or r['trace'][i]['largest_sector_in'] != base['trace'][i]['largest_sector_in']):
+                sampled.append(dict(policy=name, window=r['trace'][i]['window'],
+                                    row_hash_same=r['audit'][i]['row_hash'] == base['audit'][i]['row_hash'],
+                                    largest_sector_in=r['trace'][i]['largest_sector_in'],
+                                    adaptive_largest_sector_in=base['trace'][i]['largest_sector_in']))
         if activation < len(r['audit']) and int(base['audit'][activation]['adaptive_next_rows']) < 4:
             raise ValueError('adaptive reference lacks bootstrap activation')
     return dict(phase=base['meta']['phase'], circuit=base['meta']['circuit'], cutoff=base['meta']['cutoff'],
                 policy_seed=base['meta']['policy_seed'], activation_window=first_fixed,
+                bootstrap_sample_differences=sampled,
                 wall={k: by[k]['wall'] for k in POLICIES},
                 reference_over_adaptive={k: by[k]['wall'] / base['wall'] for k in POLICIES[1:]})
 

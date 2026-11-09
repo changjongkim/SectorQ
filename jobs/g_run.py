@@ -64,18 +64,33 @@ def squeue(job, fmt, state=None):
         return ""
 
 
+_LEFT = {}
+
+
 def left(job):
-    t = squeue(job, "%L")
-    if not t or not re.match(r"^[\d:-]+$", t):
-        return 0
-    days = 0
-    if "-" in t:
-        d, t = t.split("-")
-        days = int(d)
-    parts = [int(x) for x in t.split(":")]
-    while len(parts) < 3:
-        parts.insert(0, 0)
-    return days * 86400 + parts[0] * 3600 + parts[1] * 60 + parts[2]
+    """Seconds left in the allocation. squeue can fail to answer for a while; jobs 59768999 (64 nodes, 3 h) and
+    59769000 (128 nodes, 4.5 h) ended after about 40 minutes with runs still open, which is what one empty answer
+    did here before (0 s left = the allocation is over). Ask again a few times; if squeue stays silent, count down
+    from its last answer."""
+    for attempt in range(4):
+        t = squeue(job, "%L")
+        if t and re.match(r"^[\d:-]+$", t):
+            days = 0
+            if "-" in t:
+                d, t = t.split("-")
+                days = int(d)
+            parts = [int(x) for x in t.split(":")]
+            while len(parts) < 3:
+                parts.insert(0, 0)
+            s = days * 86400 + parts[0] * 3600 + parts[1] * 60 + parts[2]
+            _LEFT[job] = (s, time.time())
+            return s
+        if attempt < 3:
+            time.sleep(15)
+    if job in _LEFT:
+        s, at = _LEFT[job]
+        return max(0, s - int(time.time() - at))
+    return 0
 
 
 def clean_locks():
