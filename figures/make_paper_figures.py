@@ -202,13 +202,19 @@ def representative_labels(labels, ticks):
     return [s if i in keep else "" for i, s in enumerate(labels)]
 
 
+def alternate_labels(labels):
+    """Every second label from the first; the last label stays."""
+    visible = [i for i, s in enumerate(labels) if s.strip()]
+    keep = set(visible[::2]) | ({visible[-1]} if visible else set())
+    return [s if i in keep else "" for i, s in enumerate(labels)]
+
+
 def tick_choices(labels, ticks, representative=False):
-    """Keep each label intact; paired quantities use three positions from the outset."""
-    if representative:
-        yield representative_labels(labels, ticks)
-        return
+    """Keep each label intact. As in the evaluation of ScaleQsim, every point has its label; when the labels of a
+    panel meet, every second one, and only then the endpoints and the middle (2026-11-09)."""
     yield labels
-    if all(re.match(r"[0-9]", s) for s in labels if s.strip()):
+    if representative or all(re.match(r"[0-9]", s) for s in labels if s.strip()):
+        yield alternate_labels(labels)
         yield representative_labels(labels, ticks)
 
 
@@ -350,7 +356,7 @@ def panel(fig, ax, name, w, h, xlabel=None, ylabel=None, before=None, drop_minor
     if labels:
         assert shown[0] == labels[0] and shown[-1] == labels[-1], name
     if representative:
-        assert shown == representative_labels(labels, ticks), name
+        assert shown in (labels, alternate_labels(labels), representative_labels(labels, ticks)), name
         assert not ticks_meet(fig, ax), name
     if secondary:
         assert all(s.count("\n") == 1 for s in shown if s), name
@@ -838,8 +844,78 @@ def ev_resector():
     split(fig, "ev_resector", 3, size=(PLACE[3][0], 2.55))
 
 
+STRONG_GPUS = (16, 32, 64, 128, 256)
+STRONG_CUTS = ("1e-4", "3e-5", "1e-5", "5e-6", "3e-6", "2e-6", "1e-6")
+
+
+def strong_run(G, big, g, kind, x):
+    """(seconds or None, measured failure) of kicked Ising at cutoff x on g GPUs, for the strong-scaling panels.
+    16 GPUs: campaign g (SectorQ of campaign r, cuPauliProp on the original circuit of campaign o, the fastest
+    deferred interval, the CPU implementations on four nodes). 32-256 GPUs: as Figure 10 (circuits_big with the
+    original-circuit baseline): SectorQ with its default settings, then the wider runs of the ladder at 1e-6."""
+    if g == 16:
+        s = {"ours": G.get(f"eng.ki.{x}.g16"), "cupp": G.get(f"cupp.ki.{x}.g16"), "defer": mf.gdeferred(G, "ki", x, 16),
+             "orqa": G.get(f"orqa.ki.{x}.n4"), "monoprop": G.get(f"monoprop.ki.{x}.n4")}[kind]
+        if s is None or s.get("status") in ("skipped_after_failure", "predicted_tl", "predicted_oom"):
+            return None, False
+        return (s["wall"], False) if mf.gok(s) else (None, True)
+    if kind in ("orqa", "monoprop"):
+        r = mf.as_big(mf.scale_rec(f"{kind}.ki.{x}.n{g // 4}"))
+    elif kind == "cupp":
+        r = mf.as_big(mf.scale_rec(f"o.cupp.ki.{x}.g{g}"))
+    elif kind == "defer":
+        r = mf.find(big, "cupp", "ki_lab", float(x), gpus=g, tuned=True)
+    else:
+        hits = [r for r in big if r["gpus"] == g and r["kind"] == "engine" and r["circuit"] == "ki_lab" and abs(r["coef"] / float(x) - 1) < 1e-9]
+        plain = [r for r in hits if "--gmax" not in r["opt"] and "--chunk" not in r["opt"]]
+        wide = [r for r in hits if r["opt"].get("--gmax") == "12"] + [r for r in hits if r["opt"].get("--gmax") == "10" and "--chunk" not in r["opt"]]
+        done = [r for r in ((wide + plain) if float(x) <= 1.0000001e-6 else (plain + wide)) if mf.ok(r)]
+        r = mf.newest(done)[0] if done else (hits[0] if hits else None)
+    if r is None:
+        return None, False
+    return (r["wall"], False) if mf.ok(r) else (None, True)
+
+
+def ev_strong():
+    """Strong scaling in the form of ScaleQsim: one panel per GPU count (16-256), kicked Ising time against the cutoff
+    for SectorQ and every baseline that runs on several nodes; below each cutoff the original-circuit cuPauliProp time
+    over the SectorQ time where both finished."""
+    G, big = md.campaign(), md.scaling_jobs()
+    fig, axes = plt.subplots(1, len(STRONG_GPUS), figsize=(5.2 * len(STRONG_GPUS), 4.9))
+    kinds = ("ours", "cupp", "defer", "orqa", "monoprop")
+    for ax, g in zip(axes, STRONG_GPUS):
+        rows = {k: [strong_run(G, big, g, k, x) for x in STRONG_CUTS] for k in kinds}
+        n = max(i + 1 for i in range(len(STRONG_CUTS)) if any(rows[k][i][0] for k in kinds))
+        for k in kinds:
+            pts = [(i, w) for i, (w, _) in enumerate(rows[k][:n]) if w]
+            if pts:
+                col, mk = mf.SQ[k]
+                ax.plot([p[0] for p in pts], [p[1] for p in pts], color=col, marker=mk, markersize=10,
+                        linewidth=3.8 if k == "ours" else 3.0, label=mf.SQ_NAME[k], zorder=4 if k == "ours" else 3)
+        labels = []
+        for i, x in enumerate(STRONG_CUTS[:n]):
+            a, b = rows["ours"][i][0], rows["cupp"][i][0]
+            labels.append(f"{x}\n({b / a:.1f}×)" if a and b and b / a < 10 else (f"{x}\n({b / a:.0f}×)" if a and b else x))
+        mf.sq_axes(ax, None, None, size=14)
+        ax.set_yscale("log")
+        ax.set_xticks(range(n))
+        ax.set_xticklabels(labels)
+        ax.set_xlim(-0.4, n - 0.6)
+        ax.set_ylim(0.1, 3000)
+        ax.set_title(f"{g} GPUs")
+        ax.set_xlabel("Cutoff (Speedup of SectorQ)")
+        ax.set_ylabel("Time (s)")
+    seen = {}
+    for ax in axes:
+        for h, l in zip(*ax.get_legend_handles_labels()):
+            seen.setdefault(l, h)
+    order = [mf.SQ_NAME[k] for k in kinds if mf.SQ_NAME[k] in seen]
+    fig.legend([seen[l] for l in order], order)
+    split(fig, "ev_strong", 2, xlabel="Cutoff (Speedup of SectorQ)", ylabel="Time (s)")
+
+
 FIGURES = [bg_anatomy, bg_accuracy, bg_windows, ev_single, ev_circuits, ev_cost, ev_prs, ev_size, ev_accuracy, ev_breakdown, ev_variability,
-           ev_staircase, ev_knobs, ev_weak, ev_scaleout, ev_fixed_rows, ev_large_time, ev_circuits128, ev_runtime, ev_resector]
+           ev_staircase, ev_knobs, ev_weak, ev_scaleout, ev_strong, ev_fixed_rows, ev_large_time, ev_circuits128, ev_runtime, ev_resector]
 
 if __name__ == "__main__":
     want = [a for a in ARGS if not a.startswith("-")]
