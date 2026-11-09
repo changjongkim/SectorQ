@@ -36,6 +36,9 @@ ONE = "-N 1 -n 1 -c 128 --cpu-bind=none"
 ALL = "-N 4 -n 16 --ntasks-per-node=4 -c 32 --cpu-bind=cores"
 ALL8 = "-N 8 -n 32 --ntasks-per-node=4 -c 32 --cpu-bind=cores"      # batch jobs (jobs/p_batch.sh)
 ALL16 = "-N 16 -n 64 --ntasks-per-node=4 -c 32 --cpu-bind=cores"
+ALL2 = "-N 2 -n 8 --ntasks-per-node=4 -c 32 --cpu-bind=cores"
+ALL32 = "-N 32 -n 128 --ntasks-per-node=4 -c 32 --cpu-bind=cores"
+ALL64 = "-N 64 -n 256 --ntasks-per-node=4 -c 32 --cpu-bind=cores"
 # name: (what it is, srun placement, arguments of jobs/p_ki.py)
 MODES = {
     "h1": ("one node, host, one partition per NUMA domain, seeded rows", ONE, "--partitions auto"),
@@ -50,6 +53,10 @@ MODES = {
     "mg16c": ("4 nodes, 16 MPI ranks with one GPU each, cut rows", ALL + " --gpus-per-node=4", "--mpi 1 --device auto --rows cut"),
     "mg32": ("8 nodes, 32 MPI ranks with one GPU each, seeded rows", ALL8 + " --gpus-per-node=4", "--mpi 1 --device auto"),
     "mg64": ("16 nodes, 64 MPI ranks with one GPU each, seeded rows", ALL16 + " --gpus-per-node=4", "--mpi 1 --device auto"),
+    "g2": ("one node, 2 GPUs, seeded rows", ONE + " --gpus-per-node=4", "--device 0,1"),
+    "mg8": ("2 nodes, 8 MPI ranks with one GPU each, seeded rows", ALL2 + " --gpus-per-node=4", "--mpi 1 --device auto"),
+    "mg128": ("32 nodes, 128 MPI ranks with one GPU each, seeded rows", ALL32 + " --gpus-per-node=4", "--mpi 1 --device auto"),
+    "mg256": ("64 nodes, 256 MPI ranks with one GPU each, seeded rows", ALL64 + " --gpus-per-node=4", "--mpi 1 --device auto"),
 }
 # NCCL carries the exchange between the GPUs of different ranks; the library binds one version of its interface, so
 # the versions installed here are tried in this order and the first that runs is kept (queue_p/nccl).
@@ -58,13 +65,54 @@ ENV = ("module load nccl/{nccl} >/dev/null 2>&1; export MPICH_GPU_SUPPORT_ENABLE
        "export LD_LIBRARY_PATH=/opt/nvidia/hpc_sdk/Linux_x86_64/2024/cuda/12.4/lib64:$LD_LIBRARY_PATH:/opt/nvidia/hpc_sdk/Linux_x86_64/26.5/cuda/13.2/lib64; ")
 
 
+# 2026-11-09: paulistrings-rs joins the main figures with its own truncation rule (after every operation), as MonoProp
+# with its own. Its ladders get the cutoffs of those figures: the single node (Figure 8: one and four GPUs), the
+# strong-scaling panels (kicked Ising on 16-256 GPUs), the seven circuits on 16 and 128 GPUs, and weak scaling
+# (WEAK below). A ladder still stops at its first run that is not ok; the cutoffs are sorted from the largest down.
+BIG3 = ("1e-4", "3e-5", "1e-5", "5e-6", "3e-6", "2e-6", "1e-6", "7e-7", "5e-7", "3e-7", "2e-7")
+EXTRA = {
+    ("ki", "g1"): ("5e-4", "3e-4", "2e-4", "5e-5", "2e-5", "5e-6", "2e-6"),
+    ("ki", "g4"): ("5e-4", "3e-4", "2e-4", "5e-5", "2e-5", "5e-6", "2e-6"),
+    ("ki", "mg16"): ("5e-6", "2e-6"), ("tfim", "mg16"): ("5e-6", "2e-6"), ("noise", "mg16"): ("5e-6", "2e-6"),
+    ("ki", "mg32"): ("5e-6", "2e-6"), ("ki", "mg64"): ("5e-6", "2e-6"),
+    ("tfimsq", "mg16"): ("5e-5", "2e-5", "5e-6", "2e-6", "1e-6", "5e-7"),
+    ("xxz", "mg16"): ("5e-5", "2e-5", "5e-6", "2e-6", "1e-6", "5e-7"),
+    ("qaoa", "mg16"): ("5e-5", "2e-5", "5e-6", "2e-6", "5e-7", "3e-7"),
+    ("hea", "mg16"): ("5e-5", "2e-5", "5e-6", "2e-6", "5e-7", "1e-7"),
+}
+LADDER128 = {"ki": BIG3, "tfim": BIG3, "noise": BIG3,
+             "tfimsq": BIG3, "xxz": BIG3,
+             "qaoa": ("1e-4", "3e-5", "1e-5", "5e-6", "3e-6", "2e-6", "1e-6", "5e-7", "3e-7", "2e-7", "1e-7", "7e-8", "5e-8"),
+             "hea": ("1e-4", "3e-5", "1e-5", "5e-6", "3e-6", "2e-6", "1e-6", "5e-7", "3e-7", "2e-7", "1e-7", "7e-8", "5e-8", "3e-8")}
+LADDER256 = {"ki": BIG3[:9]}
+# weak scaling: the cutoffs of make_eval_figures.WEAK_S/WEAK_G and BIG_WEAK_S/BIG_WEAK (512 GPUs are not run)
+WEAK_MODE = {1: "g1", 2: "g2", 4: "g4", 8: "mg8", 16: "mg16", 32: "mg32", 64: "mg64", 128: "mg128", 256: "mg256"}
+WEAK = {"S": {1: "6.2e-5", 2: "4.3e-5", 4: "3e-5", 8: "2.1e-5", 16: "1.5e-5", 32: "1e-5", 64: "7.1e-6", 128: "4.9e-6", 256: "3.5e-6"},
+        "L": {1: "2e-5", 2: "1.4e-5", 4: "1e-5", 8: "7e-6", 16: "4.8e-6", 32: "3.4e-6", 64: "2.3e-6", 128: "1.6e-6", 256: "1.15e-6"}}
+
+
 def cuts_of(c, m):
-    """The ladder of one circuit in one mode: on 32 and 64 GPUs one cutoff below the ladder of the four-node runs."""
-    return CIRCUITS[c][1] + ((MORE[c],) if m in BIG else ())
+    """The ladder of one circuit in one mode: on 32 and 64 GPUs one cutoff below the ladder of the four-node runs, the
+    cutoffs of the main figures (EXTRA), and the ladders on 128 and 256 GPUs."""
+    if m == "mg128":
+        return LADDER128[c]
+    if m == "mg256":
+        return LADDER256.get(c, ())
+    if m not in (CIRCUITS[c][2] or MODES) or m in ("g2", "mg8"):
+        return ()
+    cuts = set(CIRCUITS[c][1] + ((MORE[c],) if m in BIG else ()) + EXTRA.get((c, m), ()))
+    return tuple(sorted(cuts, key=lambda x: -float(x)))
 
 
 def runs():
-    return [(f"p.{m}.{c}.{x}", m, c, x) for c, (_, cuts, modes) in CIRCUITS.items() for m in (modes or MODES) for x in cuts_of(c, m)]
+    out = [(f"p.{m}.{c}.{x}", m, c, x) for c in CIRCUITS for m in MODES for x in cuts_of(c, m)]
+    have = {(m, c, x) for _, m, c, x in out}
+    for load, cut in WEAK.items():
+        for c in ("ki", "tfim", "noise"):
+            for g, m in WEAK_MODE.items():
+                if (m, c, cut[g]) not in have:             # a point of the sweep already measures it
+                    out.append((f"p.weak{load}.{m}.{c}.{cut[g]}", m, c, cut[g]))
+    return out
 
 
 def record(rid):
@@ -74,10 +122,28 @@ def record(rid):
         return None
 
 
+_LEFT = {}
+
+
 def left(job):
-    out = subprocess.run(["squeue", "-h", "-j", job, "-o", "%L"], capture_output=True, text=True).stdout.strip()
-    m = re.match(r"(?:(\d+)-)?(?:(\d+):)?(\d+):(\d+)$", out)
-    return 0 if not m else int(m.group(1) or 0) * 86400 + int(m.group(2) or 0) * 3600 + int(m.group(3)) * 60 + int(m.group(4))
+    """Seconds left; squeue that does not answer is asked again, then the count goes on from its last answer (an empty
+    answer read as 0 s ended the scale jobs 59768999 and 59769000 early)."""
+    for attempt in range(4):
+        try:
+            out = subprocess.run(["squeue", "-h", "-j", job, "-o", "%L"], capture_output=True, text=True, timeout=60).stdout.strip()
+        except subprocess.TimeoutExpired:
+            out = ""
+        m = re.match(r"(?:(\d+)-)?(?:(\d+):)?(\d+):(\d+)$", out)
+        if m:
+            s = int(m.group(1) or 0) * 86400 + int(m.group(2) or 0) * 3600 + int(m.group(3)) * 60 + int(m.group(4))
+            _LEFT[job] = (s, time.time())
+            return s
+        if attempt < 3:
+            time.sleep(15)
+    if job in _LEFT:
+        s, at = _LEFT[job]
+        return max(0, s - int(time.time() - at))
+    return 0
 
 
 def launch(rid, m, c, x, job, host, nccl):
@@ -157,7 +223,7 @@ def main():
         if int(re.match(r"-N (\d+)", MODES[m][1]).group(1)) > have:
             continue                                    # needs more nodes than this allocation has
         cuts = cuts_of(c, m)
-        before = [record(f"p.{m}.{c}.{y}") for y in cuts[:cuts.index(x)]]
+        before = [] if rid.startswith("p.weak") else [record(f"p.{m}.{c}.{y}") for y in cuts[:cuts.index(x)]]
         if any(b is not None and b.get("status") != "ok" for b in before):
             json.dump(dict(status="skipped_after_failure"), open(os.path.join(Q, rid + ".json"), "w"))
             continue
