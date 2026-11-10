@@ -25,6 +25,15 @@ OUT = os.path.join(ROOT, "results", "g_ext")
 LOGS = os.path.join(ROOT, "logs", "g")
 
 
+def solved(result):
+    """The adapter's result file exists and reports a completed solve."""
+    try:
+        done = json.load(open(result))
+    except (OSError, ValueError):
+        return False
+    return done.get("status") == "success" and bool(done.get("results"))
+
+
 def stop(proc):
     if proc is None:
         return
@@ -140,17 +149,31 @@ def launch(item, job, hosts):
     start = time.perf_counter()
     with open(path(".stdout.txt"), "w") as so, open(path(".stderr.txt"), "w") as se:
         proc = subprocess.Popen(command, env=env, stdout=so, stderr=se, stdin=subprocess.DEVNULL, start_new_session=True)
-        try:
-            code = proc.wait(timeout=limit)
+        # MonoProp can hang in MPI teardown after it wrote its result (queue_s/done_prev, job 61024060: two runs held
+        # 16 nodes to the limit). Once the adapter's result file reports success, the run gets 60 s to exit and is then
+        # stopped; the result below is read from that file.
+        code, seen = None, None
+        while code is None:
+            try:
+                code = proc.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                waited = time.perf_counter() - start
+                if seen is None and backend != "orqa" and solved(result):
+                    seen = waited
+                if waited > limit or (seen is not None and waited - seen > 60):
+                    break
+        if code is not None:
             record.update(exit_code=code, status="success" if code == 0 else "failed")
-        except subprocess.TimeoutExpired:
+        else:
             os.killpg(proc.pid, signal.SIGTERM)
             try:
                 proc.wait(timeout=20)
             except subprocess.TimeoutExpired:
                 os.killpg(proc.pid, signal.SIGKILL)
                 proc.wait()
-            record.update(exit_code=proc.returncode, status="timeout")
+            record.update(exit_code=proc.returncode, status="timeout" if seen is None else "failed")
+            if seen is not None:
+                record["stopped_after_result"] = True
     record["cold_end_to_end_seconds"] = time.perf_counter() - start
     for s in samplers:
         stop(s)

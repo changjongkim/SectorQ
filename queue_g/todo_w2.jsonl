@@ -1,0 +1,1 @@
+{"id": "m.eng.L32.1e-4.g16.t2hw", "nodes": 4, "kind": "eng", "limit": 7200, "per": 4, "bin": "bin/pp_engine_iw", "args": "--circuit tfim_sq --lx 32 --ly 32 --theta 0.2 --phi -0.3 --steps 10 --coef 1e-4 --obs-all 1 --target 4000000 --trace 1 --vram-frac 0.9", "coef": 0.0001, "est": 7200}
