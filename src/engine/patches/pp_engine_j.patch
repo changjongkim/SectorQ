@@ -1,0 +1,176 @@
+--- a/src/engine/pp_engine.cpp
++++ b/src/engine/pp_engine.cpp
+@@ -359,6 +359,26 @@
+   return w;
+ }
+ 
++// Rows for strings at position k that the branching rotations of operations [k, e) conserve: the annihilator of
++// their generators as seen from position k (built as in planWindow). A window's own rows are conserved over [b, e);
++// these rows are a superset, since fewer generators remain. They divide a piece whose terms all lie in one coset of
++// the window's generators (the descendants of one input string), which no row of the window can divide.
++static std::vector<BV> annihilatorFrom(int k, int e) {
++  Span V; V.L = g_L;
++  std::vector<int> maps;
++  for (int j = k; j < e; j++) {
++    const Op& op = g_ops[j];
++    if (op.type == OP_ROT && op.branches) {
++      BV v = op.gen;
++      for (int i = (int)maps.size() - 1; i >= 0; --i) mapVec(g_ops[maps[i]], v.data(), g_L);
++      V.add(v);
++    } else if (changesBits(op)) {
++      maps.push_back(j);
++    }
++  }
++  return V.annihilator();
++}
++
+ // Without a pilot: end the window right after the last truncation in its second half.
+ static int snapEnd(const Window& w) {
+   const int M = (int)g_ops.size();
+@@ -586,6 +606,7 @@
+   std::mutex em;
+   double expec = 0;
+   std::atomic<long> nout{0}, peakSum{0}, splits{0}, runs{0}, peak{0}, hostSplits{0}, verified{0}, violations{0}, earlyDedups{0}, shares{0};
++  std::atomic<long> rowRetries{0}, laterRows{0};   // splits whose first row did not divide the piece; of them, split by a row of the remaining operations
+   std::atomic<int> waiting{0};          // workers of this node with nothing to do while another one is busy
+   std::atomic<int> finished{0};
+   // conserved rows as masks for strings at the start of the current window, and their expected values
+@@ -677,13 +698,60 @@
+   long numTerms() { int64_t n = 0; CUPP(cupaulipropPauliExpansionGetNumTerms(handle, ex[cur], &n)); return (long)n; }
+ 
+   // A spare row of the window, as a mask for strings at position k.
+-  BV splitRow(const Window& w, int k) {
+-    if (w.spare.empty()) die("window has no row left to split a bucket", __LINE__);
+-    BV r = w.spare[rng() % w.spare.size()];
+-    for (int j = w.b; j < k; j++) mapMask(g_ops[j], r.data(), g_L);
++  BV spareAt(const Window& w, size_t j, int k) {
++    BV r = w.spare[j % w.spare.size()];
++    for (int i = w.b; i < k; i++) mapMask(g_ops[i], r.data(), g_L);
+     return r;
+   }
+ 
++  // A row for strings at position k that divides a piece of m terms; ones(r) counts the terms of odd parity with r.
++  // First the spare row drawn as before (the only one tried earlier, so runs whose first row divides are unchanged),
++  // then the other spare rows; if none divides (the terms lie in one coset of the window's generators), rows that only
++  // the operations k..e-1 conserve: the most even of 32 random ones, else of their basis. Without a dividing row the
++  // run stops with a message instead of requeueing the same piece again (pp_engine_i repeated it without end).
++  template <class F> BV divideRow(const Window& w, Shared& sh, int k, long m, F ones) {
++    if (w.spare.empty()) die("window has no row left to split a bucket", __LINE__);
++    const size_t first = rng() % w.spare.size();
++    for (size_t j = 0; j < w.spare.size(); j++) {
++      BV r = spareAt(w, first + j, k);
++      const long c = ones(r);
++      if (c > 0 && c < m) { if (j) sh.rowRetries++; return r; }
++    }
++    sh.rowRetries++;
++    const std::vector<BV> ann = annihilatorFrom(k, w.e);
++    const int W = g_L.words();
++    BV best;
++    long bestMin = 0;
++    auto consider = [&](const BV& r) {
++      const long c = ones(r), mn = std::min(c, m - c);
++      if (mn > bestMin) { bestMin = mn; best = r; }
++    };
++    for (int t = 0; t < 32 && !ann.empty() && bestMin * 4 < m; t++) {
++      BV r(W, 0);
++      bool any = false;
++      while (!any)
++        for (auto& a : ann) if (rng() & 1ULL) { any = true; for (int x = 0; x < W; x++) r[x] ^= a[x]; }
++      consider(r);
++    }
++    for (size_t j = 0; j < ann.size() && bestMin == 0; j++) consider(ann[j]);
++    if (bestMin == 0) {
++      fprintf(stderr, "[node %d] operation %d: none of the rows conserved by operations %d..%d divides a piece of %ld terms\n",
++              g_rank, k, k, w.e - 1, m);
++      die("no row divides an overflowing piece", __LINE__);
++    }
++    sh.laterRows++;
++    fprintf(stderr, "[node %d] operation %d: piece of %ld terms split by a row of operations %d..%d (%ld : %ld)\n",
++            g_rank, k, m, k, w.e - 1, bestMin, m - bestMin);
++    return best;
++  }
++
++  // Do the owners of the current expansion's m terms (dOwners) take more than one value?
++  bool ownersDiffer(long m) {
++    uint16_t o0 = 0;
++    CUDA(cudaMemcpy(&o0, dOwners, sizeof(o0), cudaMemcpyDeviceToHost));
++    return pp_count_ne16(dOwners, m, (int)o0) > 0;
++  }
++
+   void requeue(Shared& sh, Bucket& piece, int startOp, bool pendingTrunc = false) {
+     { std::lock_guard<std::mutex> lk(sh.qm);
+       sh.queue.push_front(Work());
+@@ -819,11 +887,25 @@
+     if (w.spare.empty()) die("window has no row left to split a bucket", __LINE__);
+     bits = std::max(1, std::min<int>(bits, (int)w.spare.size()));
+     std::vector<uint64_t> rows;
+-    const size_t first = rng() % w.spare.size();        // `bits` different spare rows, as masks for strings at position k
+-    for (int j = 0; j < bits; j++) {
+-      BV r = w.spare[(first + j) % w.spare.size()];
+-      for (int i = w.b; i < k; i++) mapMask(g_ops[i], r.data(), g_L);
+-      rows.insert(rows.end(), r.begin(), r.end());
++    auto onesOnGpu = [&](const BV& r) {
++      pp_owners16((const uint64_t*)xz[cur], m, words, r.data(), 1, dOwners);
++      return (long)pp_count_ne16(dOwners, m, 0);
++    };
++    if (bits == 1) {
++      const BV r = divideRow(w, sh, k, m, onesOnGpu);
++      rows.assign(r.begin(), r.end());
++    } else {
++      const size_t first = rng() % w.spare.size();      // `bits` different spare rows, as masks for strings at position k
++      for (int j = 0; j < bits; j++) {
++        BV r = spareAt(w, first + j, k);
++        rows.insert(rows.end(), r.begin(), r.end());
++      }
++      pp_owners16((const uint64_t*)xz[cur], m, words, rows.data(), bits, dOwners);
++      if (!ownersDiffer(m)) {                           // all terms in one piece: one row that divides them
++        bits = 1;
++        const BV r = divideRow(w, sh, k, m, onesOnGpu);
++        rows.assign(r.begin(), r.end());
++      }
+     }
+     std::vector<int64_t> c2((size_t)1 << bits, 0);
+     pp_owners16((const uint64_t*)xz[cur], m, words, rows.data(), bits, dOwners);
+@@ -885,11 +967,27 @@
+       // Too large to load with room to work: split on the host and requeue.
+       sh.canStay = false;
+       if (!allowSplit) die("bucket does not fit the GPU (this mode cannot split)", __LINE__);
+-      BV row = splitRow(w, wk.startOp);
++      auto onesOnHost = [&](const BV& r) {
++        long c = 0;
++        for (auto& k : b.ch)
++          for (long i = 0; i < k.n; i++) c += dotParity(k.xz + (size_t)i * words, r.data(), words);
++        return c;
++      };
++      const BV row = divideRow(w, sh, wk.startOp, nb0, onesOnHost);
++      // Both halves are appended a chunk at a time (pp_engine_i appended one term at a time), in the same order.
+       Bucket h[2];
+-      for (auto& k : b.ch)
+-        for (long i = 0; i < k.n; i++)
+-          appendHost(h[dotParity(k.xz + (size_t)i * words, row.data(), words)], k.xz + (size_t)i * words, k.cf + i, 1);
++      std::vector<uint64_t> hx[2];
++      std::vector<double> hc[2];
++      for (auto& k : b.ch) {
++        for (int s = 0; s < 2; s++) { hx[s].clear(); hc[s].clear(); }
++        for (long i = 0; i < k.n; i++) {
++          const uint64_t* t = k.xz + (size_t)i * words;
++          const int s = dotParity(t, row.data(), words);
++          hx[s].insert(hx[s].end(), t, t + words);
++          hc[s].push_back(k.cf[i]);
++        }
++        for (int s = 0; s < 2; s++) if (!hc[s].empty()) appendHost(h[s], hx[s].data(), hc[s].data(), (long)hc[s].size());
++      }
+       releaseBucket(b);
+       for (int s = 0; s < 2; s++) if (h[s].n > 0) requeue(sh, h[s], wk.startOp, wk.pendingTrunc);
+       sh.hostSplits++;
+@@ -1749,6 +1847,10 @@
+   MPI_Allreduce(twl, tw, 2, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+   long tll[2] = {sh.shares.load(), sh.earlyDedups.load()}, tl[2];
+   MPI_Allreduce(tll, tl, 2, MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
++  long rrl[2] = {sh.rowRetries.load(), sh.laterRows.load()}, rr[2];
++  MPI_Allreduce(rrl, rr, 2, MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
++  if (g_rank == 0 && (rr[0] || rr[1]))
++    printf("split rows: %ld splits needed another row than the first spare row; %ld of them a row of the remaining operations\n", rr[0], rr[1]);
+   double xl[7] = {g_xCounts, g_xPost, g_xAlloc, g_xWait, (double)g_pool.allocNs.load() * 1e-9, tPrealloc, (double)chunksAhead}, xs[7];
+   MPI_Allreduce(xl, xs, 7, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+   long nfl[2] = {0, 0}, nf[2] = {0, 0};

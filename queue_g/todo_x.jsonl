@@ -1,0 +1,1 @@
+{"id": "jchk.eng.xxz.3e-6.g16", "nodes": 4, "per": 4, "kind": "eng", "limit": 2400, "args": "--circuit xxz --lx 8 --ly 8 --jxy 0.1 --jz 0.15 --steps 6 --coef 3e-6 --target 4000000 --trace 1 --vram-frac 0.9", "smi": 1000, "coef": 3e-06, "bin": "bin/pp_engine_j", "est": 300}
