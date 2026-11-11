@@ -675,6 +675,23 @@ WEAK_G = {1: "2e-5", 2: "1.4e-5", 4: "1e-5", 8: "7e-6", 16: "4.8e-6"}
 
 QR = os.path.join(HERE, "..", "queue_r")
 QO = os.path.join(HERE, "..", "queue_o")     # campaign o: cuPauliProp on the original circuits (jobs/o_items.py)
+QP = os.path.join(HERE, "..", "queue_p", "done")     # paulistrings-rs (jobs/p_drive.py)
+# paulistrings-rs with its own truncation rule (a truncation after every operation, SectorQ every 10), as MonoProp runs
+# with its own: one GPU per MPI rank; 128 and 256 ranks with the build whose P_MAX_BITS is 8 (third_party/paulistrings-rs-p8).
+PRS_MODE = {1: "g1", 2: "g2", 4: "g4", 8: "mg8", 16: "mg16", 32: "mg32", 64: "mg64", 128: "mg128", 256: "mg256"}
+
+
+def prs_rec(c, x, g):
+    """The paulistrings-rs run of circuit c at cutoff x on g GPUs (a point of its ladder, else a weak-scaling point)."""
+    m = PRS_MODE.get(g)
+    if m is None:
+        return None
+    for rid in (f"p.{m}.{c}.{x}", f"p.weakS.{m}.{c}.{x}", f"p.weakL.{m}.{c}.{x}"):
+        try:
+            return json.load(open(os.path.join(QP, rid + ".json")))
+        except (OSError, ValueError):
+            continue
+    return None
 
 
 def campaign_g():
@@ -701,6 +718,12 @@ def campaign_g():
                 if rec.get("reused") or short:
                     continue
             out[name] = rec
+    # A run made again with a two-hour limit (jobs/u_items.py: <id>.t2h; .t2hw with the any-width binary) replaces the
+    # run of the same problem that reached the 20-minute limit, when it finished.
+    for name in list(out):
+        base, _, tag = name.rpartition(".")
+        if tag in ("t2h", "t2hw") and gok(out[name]) and base in out and not gok(out[base]):
+            out[base] = dict(out[name], limit_note=f"two-hour limit ({name})")
     return out
 
 
@@ -770,9 +793,9 @@ def count(n):
 # the GPU count, one line per implementation with a fixed color and marker, a legend strip above the panels, in the
 # order single node -> weak scaling -> strong scaling -> other circuits -> scale-out.
 SQ = {"ours": ("#1f77b4", "o"), "cupp": ("#d62728", "^"), "defer": ("#8c564b", "s"), "orqa": ("#800080", "v"), "monoprop": ("#FFA500", "d"),
-      "spd": ("#008000", "X"), "julia": ("#17becf", "P"), "ppvm": ("#7f7f7f", "h"), "qiskit": ("#e377c2", "*")}
+      "spd": ("#008000", "X"), "julia": ("#17becf", "P"), "ppvm": ("#7f7f7f", "h"), "qiskit": ("#e377c2", "*"), "prs": ("#6B8E23", "D")}
 SQ_NAME = {"ours": "SectorQ", "cupp": "cuPauliProp", "defer": "cuPauliProp, dedup deferred", "orqa": "ORQA (reproduction)", "monoprop": "MonoProp",
-           "spd": "SPD", "julia": "PauliPropagation.jl", "ppvm": "ppvm", "qiskit": "Qiskit pauli-prop"}
+           "spd": "SPD", "julia": "PauliPropagation.jl", "ppvm": "ppvm", "qiskit": "Qiskit pauli-prop", "prs": "paulistrings-rs"}
 SHORT_WHY = {"oom": "out of memory", "tl": "over 40 min", "predicted_tl": "over 40 min"}
 STOPS = False     # True: a cross where an implementation stops; False: its line just ends at the last run that finished
 SIZES = False     # True: the size of the terms in bytes as a third line under a cutoff; False: the number of terms only
@@ -804,6 +827,8 @@ def sq_runs(G, kind, c, cutoffs, suffix):
     """The records of one implementation over the cutoffs (None where there is no item or no record yet)."""
     if kind == "defer":
         return [gdeferred(G, c, x, int(suffix[1:])) for x in cutoffs]
+    if kind == "prs":
+        return [prs_rec(c, x, int(suffix[1:])) for x in cutoffs]
     return [G.get(f"{'eng' if kind == 'ours' else kind}.{c}.{x}.{suffix}") for x in cutoffs]
 
 
@@ -888,7 +913,8 @@ def g_single_node(G, c="ki", title="Kicked Ising", ax=None):
              ("cupp", "g4", "-", "cuPauliProp (4 GPUs)"), ("cupp", "g1", "--", "cuPauliProp (1 GPU)"),
              ("defer", "g4", "-", "cuPauliProp, dedup deferred (4 GPUs)"), ("spd", "n1", "--", "SPD (1 GPU)"),
              ("orqa", "n1", "-", "ORQA, reproduction (64 cores)"), ("monoprop", "n1", "-", "MonoProp (64 cores)"),
-             ("julia", "n1", "-", "PauliPropagation.jl (64 cores)"), ("ppvm", "n1", "-", "ppvm (64 cores)"), ("qiskit", "n1", "-", "Qiskit pauli-prop (1 core)")]
+             ("julia", "n1", "-", "PauliPropagation.jl (64 cores)"), ("ppvm", "n1", "-", "ppvm (64 cores)"), ("qiskit", "n1", "-", "Qiskit pauli-prop (1 core)"),
+             ("prs", "g4", "-", "paulistrings-rs (4 GPUs)"), ("prs", "g1", "--", "paulistrings-rs (1 GPU)")]
     rows, got = [], []
     for kind, suffix, ls, label in lines:
         recs, pts, fail = sq_line(ax, G, kind, c, cutoffs, suffix, label=label, ls=ls, lw=3.4 if kind == "ours" else 2.6, ms=9 if kind == "ours" else 8)
@@ -952,11 +978,13 @@ def g_weak(G, big=(), axes=None):
         cuts = {**cuts, **extra}
         for j, (c, title) in enumerate(G3):
             ax = axes[j][r]
-            for kind in ("ours", "cupp", "defer", "orqa", "monoprop"):
+            for kind in ("ours", "cupp", "defer", "orqa", "monoprop", "prs"):
                 pts, stop = [], None
                 for i, g in enumerate(counts):
                     x = cuts[g]
-                    if g > 16:
+                    if kind == "prs":
+                        s = prs_rec(c, x, g)
+                    elif g > 16:
                         s = big_weak(kind, load, c, x, g, big)
                     elif kind == "ours":
                         s = G.get(f"weak{load}.{c}.{x}.g{g}") or G.get(f"eng.{c}.{x}.g{g}")
@@ -1025,7 +1053,7 @@ def g_strong(G, c="ki", cutoffs=("1e-4", "3e-5", "1e-5", "3e-6", "1e-6"), axes=N
     return rows
 
 
-def g_circuits(G, g=16, axes=None, which=None, keep=None, sizes=None):
+def g_circuits(G, g=16, axes=None, which=None, keep=None, sizes=None, kinds=("ours", "cupp", "defer")):
     """Seven circuits on 16 GPUs: SectorQ against cuPauliProp's two distributed modes, time against the problem size.
     Every cutoff of a panel has its tick; below it the speedup of SectorQ over cuPauliProp's distributed mode.
     With `axes` (panels of another figure, make_deck_figures.py) only the circuits `which` are drawn, one per panel;
@@ -1044,8 +1072,11 @@ def g_circuits(G, g=16, axes=None, which=None, keep=None, sizes=None):
         if keep is not None:
             cutoffs = keep(G, c, cutoffs, g)
         got = {}
-        for kind in ("ours", "cupp", "defer"):
-            recs, pts, fail = sq_line(ax, G, kind, c, cutoffs, f"g{g}", label=SQ_NAME[kind] if j == 0 else None, lw=3.8 if kind == "ours" else 3.0, ms=9)
+        for kind in kinds:
+            # the CPU implementations on the same nodes; each line is named on the first panel where it has points
+            suffix = f"n{g // 4}" if kind in ("orqa", "monoprop") else f"g{g}"
+            named = any(l.get_label() == SQ_NAME[kind] for a in flat[:j] for l in a.get_lines())
+            recs, pts, fail = sq_line(ax, G, kind, c, cutoffs, suffix, label=None if named else SQ_NAME[kind], lw=3.8 if kind == "ours" else 3.0, ms=9)
             got[kind] = recs
             rows.append((name.replace("\n", " "), SQ_NAME[kind], [(cutoffs[i], s["wall"]) for i, s in enumerate(recs) if gok(s)], (cutoffs[fail[0]], fail[1]) if fail else None))
         extra, stopped = [], False
@@ -1244,7 +1275,7 @@ def g_qubits(G, axes=None):
         ax.set_xticks(range(len(SIZE_L)))
         ax.set_xticklabels([f"{L * L:,}" for L in SIZE_L])
         ax.set_xlim(-0.4, len(SIZE_L) - 0.4)
-        ax.set_ylim(0.1, 3000)
+        ax.set_ylim(0.1, 10000)                         # 1,024 qubits at 1e-4 take 5,257 s (two-hour limit)
         ax.set_title(f"cutoff {x}", fontsize=15, fontweight="bold")
     if fig is not None:
         sq_legend(fig, axes[0], 1.2, 4, extra=False)

@@ -1,13 +1,18 @@
-"""Audit completed 32/64-GPU matched-truncation jobs without changing raw data."""
+"""Audit the matched-truncation runs (a truncation after every operation in both systems) on 16, 32 and 64 GPUs
+without changing raw data. 16 GPUs: the runs of Figure 13 before it became part of this table (jobs/p_sq.sh logs
+logs/p/sq.e1.*.g16.*.out; no batch log of their own, so the job checks apply to 32 and 64 GPUs only).
+
+  ../env/bin/python3 analysis/paper_prs_scale.py [--latex]"""
 import collections
 import csv
 import hashlib
 import json
 from pathlib import Path
 import re
+import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-JOBS = {32: '59769001', 64: '59769002'}
+JOBS = {16: None, 32: '59769001', 64: '59769002'}
 CUTS = {
     'ki': '1e-3 1e-4 3e-5 1e-5 3e-6 1e-6 5e-7',
     'tfim': '1e-4 3e-5 1e-5 3e-6 1e-6 5e-7',
@@ -16,6 +21,15 @@ CUTS = {
     'xxz': '1e-4 3e-5 1e-5 3e-6 1e-6',
     'qaoa': '1e-4 3e-5 1e-5 3e-6 1e-6 5e-7',
     'hea': '1e-4 3e-5 1e-5 3e-6 1e-6 3e-7 1e-7',
+}
+CUTS16 = {
+    'ki': '1e-3 1e-4 3e-5 1e-5 3e-6 1e-6',
+    'tfim': '1e-4 3e-5 1e-5 3e-6 1e-6',
+    'noise': '1e-4 3e-5 1e-5 3e-6 1e-6',
+    'tfimsq': '1e-4 3e-5 1e-5 3e-6',
+    'xxz': '1e-4 3e-5 1e-5 3e-6',
+    'qaoa': '1e-4 3e-5 1e-5 3e-6 1e-6',
+    'hea': '1e-4 3e-5 1e-5 3e-6 1e-6 3e-7',
 }
 OOM = re.compile(r'out of memory|OutOfMemory|oom_kill|oom-kill|MemoryError', re.I)
 
@@ -29,8 +43,8 @@ def audit():
         return data.decode('utf-8', errors='replace')
 
     for g, job in JOBS.items():
-        batch = read('logs/pp_p_g%d-%s.out' % (g, job))
-        for circuit, ladder in CUTS.items():
+        batch = read('logs/pp_p_g%d-%s.out' % (g, job)) if job else None
+        for circuit, ladder in (CUTS16 if g == 16 else CUTS).items():
             for cutoff in ladder.split():
                 stem = '' if circuit == 'ki' else circuit + '.'
                 sqlog = 'logs/p/sq.e1.%sg%d.%s.out' % (stem, g, cutoff)
@@ -38,7 +52,7 @@ def audit():
                 exits = re.findall(r'^exit=(\d+)$', sq, re.M)
                 assert len(exits) == 1, sqlog
                 code = int(exits[0])
-                assert 'SectorQ %s %d GPUs %s:' % (circuit, g, cutoff) in batch
+                assert batch is None or 'SectorQ %s %d GPUs %s:' % (circuit, g, cutoff) in batch
                 assert 'nodes=%d gpus/node=4' % (g // 4) in sq
                 assert 'truncEvery=1' in sq
                 status = ('ok' if code == 0 else 'timeout' if code == 124
@@ -53,7 +67,7 @@ def audit():
                 prs = json.loads(read(record))
                 row.update(prs_status=prs['status'], prs_record=record, prs_exit=prs.get('exit'))
                 if prs['status'] != 'skipped_after_failure':
-                    assert str(prs['job']) == job, record
+                    assert job is None or str(prs['job']) == job, record
                     log = read(prs['log'])
                     row['prs_log'] = prs['log']
                     if prs['status'] == 'ok':
@@ -101,3 +115,18 @@ if __name__ == '__main__':
         writer.writeheader()
         writer.writerows(result['rows'])
     print(json.dumps(result['summary'], indent=2))
+    if '--latex' in sys.argv:
+        # Table tab:prs-scale: per circuit and GPU count, the largest shared cutoff, the SectorQ time and the
+        # paulistrings-rs time over the SectorQ time.
+        names = {'ki': 'Kicked Ising', 'tfim': 'TFIM heavy-hex', 'noise': 'Noisy kicked Ising', 'tfimsq': 'TFIM $11\\times11$',
+                 'xxz': 'XXZ $8\\times8$', 'qaoa': 'QAOA', 'hea': 'Ansatz'}
+
+        def tex(cut):
+            m, e = cut.split('e-')
+            return '$10^{-%s}$' % e if m == '1' else '$%s\\times10^{-%s}$' % (m, e)
+        for c in CUTS:
+            cells = []
+            for g in JOBS:
+                r = next(x for x in result['summary'][g]['largest_shared_by_circuit'] if x['circuit'] == c)
+                cells += [tex(r['cutoff']), '%.1f' % r['sectorq_seconds'], '%.1f' % r['prs_over_sectorq_time']]
+            print(names[c] + ' & ' + ' & '.join(cells) + ' \\\\')

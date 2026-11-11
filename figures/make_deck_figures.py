@@ -470,9 +470,10 @@ def d_single_node():
     mf.g_single_node(campaign(), ax=ax)
     found = dict((n, h) for h, n in entries(fig, ax))
     # three columns that read row by row: the 4-GPU runs, the 1-GPU runs, then the implementations on the host
-    grid = [["SectorQ (4 GPUs)", "SectorQ (1 GPU)", "SPD (1 GPU)", "ppvm (64 cores)"],
-            ["cuPauliProp (4 GPUs)", "cuPauliProp (1 GPU)", "MonoProp (64 cores)", "Qiskit pauli-prop (1 core)"],
-            ["cuPauliProp, dedup deferred (4 GPUs)", "ORQA, reproduction (64 cores)", "PauliPropagation.jl (64 cores)"]]
+    # (13 entries in three columns of 5, 4 and 4: the GPU implementations, cuPauliProp's modes and MonoProp, the CPU ones)
+    grid = [["SectorQ (4 GPUs)", "SectorQ (1 GPU)", "paulistrings-rs (4 GPUs)", "paulistrings-rs (1 GPU)", "SPD (1 GPU)"],
+            ["cuPauliProp (4 GPUs)", "cuPauliProp (1 GPU)", "cuPauliProp, dedup deferred (4 GPUs)", "MonoProp (64 cores)"],
+            ["ORQA, reproduction (64 cores)", "PauliPropagation.jl (64 cores)", "ppvm (64 cores)", "Qiskit pauli-prop (1 core)"]]
     order = [n for column in grid for n in column if n in found]
     order += [n for n in found if n not in order]                    # the cross, and any line this list does not know
     top = strip(fig, [[(found[n], n) for n in order]], size=13, ncol=3)
@@ -629,7 +630,7 @@ def stops(reasons):
 
 
 
-def circuits16(name, per_term=False):
+def circuits16(name, per_term=False, kinds=("ours", "cupp", "defer"), keep=None):
     """All seven circuits on 16 GPUs in one picture as wide as a slide (1744 x 580 px there). Two rows of panels whose
     widths follow their numbers of cutoffs, so that the tick labels have one size: the three main circuits above,
     the other four below. One legend line, one x label, the y axis once per row.
@@ -650,7 +651,7 @@ def circuits16(name, per_term=False):
         if r["kind"] == "engine" and mf.ok(r) and r.get("boundary"):
             more.setdefault({v: k for k, v in mf.BIG_NAME.items()}.get(r["circuit"]), {})[r["opt"]["--coef"]] = r["boundary"]
     G = campaign()
-    rows = mf.g_circuits(G, axes=panels, which=which, keep=slide_ladder, sizes=more)
+    rows = mf.g_circuits(G, axes=panels, which=which, keep=keep or slide_ladder, sizes=more, kinds=kinds)
     shown = {}
     for j, ax in enumerate(panels):
         c = which[j]
@@ -662,7 +663,7 @@ def circuits16(name, per_term=False):
         ax.set_xlabel("")
         ticks = [t.get_text().split("\n")[0] for t in ax.get_xticklabels()]
         size_ticks(ax, c, peaks_of(c, ticks), 16)
-        times = {kind: dict(rows[3 * j + k][2]) for k, kind in enumerate(("ours", "cupp", "defer"))}
+        times = {kind: dict(rows[len(kinds) * j + k][2]) for k, kind in enumerate(kinds)}
         if per_term:
             for line in list(ax.lines):
                 line.remove()
@@ -708,7 +709,8 @@ def d_cost_all():
     return circuits16("d_cost_all", per_term=True)
 
 
-def circuits_big(g, ladder=("1e-4", "3e-5", "1e-5", "5e-6", "3e-6", "2e-6", "1e-6", "7e-7", "5e-7", "3e-7", "2e-7"), original_baseline=False):
+def circuits_big(g, ladder=("1e-4", "3e-5", "1e-5", "5e-6", "3e-6", "2e-6", "1e-6", "7e-7", "5e-7", "3e-7", "2e-7"), original_baseline=False,
+                 circuits=None, kinds=("ours", "cupp", "defer", "orqa", "monoprop")):
     """The three circuits of the scaling jobs on `g` GPUs in one picture as wide as a slide (1744 x 580 px there): time
     against the cutoff for SectorQ and the two modes of cuPauliProp on the same nodes, in the form of d_circuits_all.
     SectorQ at cutoff 1e-6 and below: the runs of the ladder of the scale campaign (a higher sector limit), as in
@@ -716,7 +718,28 @@ def circuits_big(g, ladder=("1e-4", "3e-5", "1e-5", "5e-6", "3e-6", "2e-6", "1e-
     big = [r for r in scaling_jobs() if r["gpus"] == g and (mf.ok(r) or r["fatal"] or r["exit"] is not None)]      # not a run that is still going
     G = campaign()
 
+    circuits = circuits or mf.G3
+
+    def run_new(kind, c, x):
+        """The circuits without runs of the scaling jobs (TFIM 11x11, XXZ, QAOA, ansatz): the records of the scale
+        campaign (jobs/u_items.py), cuPauliProp on the original circuit first (o.: --frame 0 where the frame removes
+        Clifford gates); SectorQ with the terms of its log for the tick labels and the shading."""
+        if kind == "prs":
+            return mf.as_big(mf.prs_rec(c, x, g))
+        ids = {"orqa": (f"orqa.{c}.{x}.n{g // 4}",), "monoprop": (f"monoprop.{c}.{x}.n{g // 4}",),
+               "cupp": (f"o.cupp.{c}.{x}.g{g}", f"cupp.{c}.{x}.g{g}"), "defer": (f"defer.{c}.{x}.g{g}",), "ours": (f"eng.{c}.{x}.g{g}",)}[kind]
+        rec = mf.scale_rec(*ids)
+        out = mf.as_big(rec)
+        if kind == "ours" and out and mf.ok(out):
+            d = mf.gdetail(rec) or {}
+            out.update(boundary=d.get("boundary"), inside=d.get("inside"))
+        return out
+
     def run(kind, c, x):
+        if c not in mf.BIG_NAME:
+            return run_new(kind, c, x)
+        if kind == "prs":
+            return mf.as_big(mf.prs_rec(c, x, g))
         if kind in ("orqa", "monoprop"):                 # the CPU implementations on the same nodes (queue_s)
             return mf.as_big(mf.scale_rec(f"{kind}.{c}.{x}.n{g // 4}"))
         if original_baseline and kind == "cupp" and c in ("ki", "noise"):
@@ -731,14 +754,18 @@ def circuits_big(g, ladder=("1e-4", "3e-5", "1e-5", "5e-6", "3e-6", "2e-6", "1e-
         done = [r for r in order if mf.ok(r)]
         return mf.newest(done)[0] if done else (order[0] if order else None)
 
-    kinds = ("ours", "cupp", "defer", "orqa", "monoprop")
-    cuts = {c: [x for x in ladder if any(run(k, c, x) if mf.STOPS else mf.ok(run(k, c, x)) for k in kinds)] for c, _ in mf.G3}
-    fig = plt.figure(figsize=(17.44, 5.8), layout="constrained")
+    cuts = {c: [x for x in ladder if any(run(k, c, x) if mf.STOPS else mf.ok(run(k, c, x)) for k in kinds)] for c, _ in circuits}
+    fig = plt.figure(figsize=(17.44, 5.8 if len(circuits) <= 3 else 10.4), layout="constrained")
     fig.get_layout_engine().set(w_pad=0.05, h_pad=0.04, wspace=0.03, rect=(0, 0, 1, 0.935))     # the legend line above
-    grid = fig.add_gridspec(1, 3, width_ratios=[len(cuts[c]) for c, _ in mf.G3])
+    if len(circuits) <= 3:
+        grid = fig.add_gridspec(1, 3, width_ratios=[len(cuts[c]) for c, _ in circuits])
+        cells = [grid[0, j] for j in range(len(circuits))]
+    else:                                               # three circuits above, the others below
+        grid = fig.add_gridspec(2, 4)
+        cells = [grid[0, j] for j in range(3)] + [grid[1, j] for j in range(len(circuits) - 3)]
     panels, rows, why = [], {}, set()
-    for j, (c, title) in enumerate(mf.G3):
-        ax = fig.add_subplot(grid[0, j])
+    for j, (c, title) in enumerate(circuits):
+        ax = fig.add_subplot(cells[j])
         panels.append(ax)
         more, peak = {}, {}
         for kind in kinds:
@@ -746,8 +773,9 @@ def circuits_big(g, ladder=("1e-4", "3e-5", "1e-5", "5e-6", "3e-6", "2e-6", "1e-
             pts = [(i, r["wall"]) for i, r in enumerate(recs) if mf.ok(r)]
             col, mk = mf.SQ[kind]
             if pts:
+                named = any(l.get_label() == mf.SQ_NAME[kind] for a in panels[:-1] for l in a.get_lines())      # first panel with points
                 ax.plot([q[0] for q in pts], [q[1] for q in pts], color=col, marker=mk, markersize=11, linewidth=4.0 if kind == "ours" else 3.2,
-                        label=mf.SQ_NAME[kind] if j == 0 else None, zorder=4 if kind == "ours" else 3, solid_capstyle="round")
+                        label=None if named else mf.SQ_NAME[kind], zorder=4 if kind == "ours" else 3, solid_capstyle="round")
                 fail = next((i for i in range(pts[-1][0] + 1, len(recs)) if recs[i] is not None), None)
                 if fail is not None and mf.STOPS:
                     ax.plot([fail], [pts[-1][1]], color=col, marker="x", markersize=12, markeredgewidth=2.8, linestyle="none", zorder=5)
@@ -764,14 +792,18 @@ def circuits_big(g, ladder=("1e-4", "3e-5", "1e-5", "5e-6", "3e-6", "2e-6", "1e-
         ax.set_ylim(0.1, 3000)                              # MonoProp finishes the smallest problems in a fraction of a second
         ax.set_yticks([0.1, 1, 10, 100, 1000])
         ax.tick_params(axis="y", labelsize=13, labelleft=(j == 0))
-        ax.set_title(f"({'abc'[j]}) {title}", fontsize=16, pad=7)
+        ax.set_title(f"({'abcdefg'[j]}) {title}", fontsize=16, pad=7)
         for i, x in enumerate(cuts[c]):                     # how many times as long the default mode takes as SectorQ
             if x in rows[c, "ours"] and x in rows[c, "cupp"]:
                 value(ax, i, rows[c, "cupp"][x], mf.times(rows[c, "cupp"][x], rows[c, "ours"][x]), dy=9, size=14)
     fig.supxlabel(XL_NEED, fontsize=15, fontweight="bold")
-    e = entries(fig, panels[0])
+    seen = {}                                           # every line once, whichever panel names it
+    for a in panels:
+        for h, l in zip(*a.get_legend_handles_labels()):
+            seen.setdefault(l, h)
+    e = [(seen[mf.SQ_NAME[k]], mf.SQ_NAME[k]) for k in kinds if mf.SQ_NAME[k] in seen]
     if mf.STOPS:
-        e[-1] = (e[-1][0], stops(why))
+        e.append((Line2D([0], [0], **CROSS), stops(why)))
     e += [(Patch(facecolor=BEYOND, edgecolor="#B5BCC4"), f"does not fit on the {g} GPUs"),
           (Line2D([0], [0], color="none"), "N×: cuPauliProp / SectorQ time")]
     fig.legend([a for a, _ in e], [b for _, b in e], loc="upper center", bbox_to_anchor=(0.5, 1 - 0.07 / 5.8), ncol=len(e), fontsize=13,

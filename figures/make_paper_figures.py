@@ -14,6 +14,7 @@ same data, colors and markers); their save step is intercepted and every panel i
     shared y labels once per comparison row, and the legend in a strip of its own as wide as the text.
 Prints, per figure, the files with their captions, and the overlaps that the check of the deck figures still finds.
 """
+import json
 import os
 import re
 import sys
@@ -151,7 +152,7 @@ def merge_rows(ax, drop_minor):
     """The labels of minor ticks (the lower row of md.stagger, the second lines of md.one_row) back into one row of
     major labels, or dropped (`drop_minor`)."""
     minor = [(t.get_loc(), t.label1.get_text()) for t in ax.xaxis.get_minor_ticks() if t.label1.get_text().strip()]
-    if not minor:
+    if not minor or getattr(ax, "_paper_keep_minor", False):        # two rows of their own (ev_weak)
         return
     major = [(loc, t.get_text()) for loc, t in zip(ax.get_xticks(), ax.get_xticklabels())]
     if drop_minor:
@@ -542,9 +543,32 @@ def ev_single():
     split(CAUGHT.pop("d_single_node"), "ev_single", 1, size=(TEXT_W, 2.5))
 
 
+CIRCUIT_KINDS = ("ours", "cupp", "defer", "orqa", "monoprop", "prs")
+
+
+def every_finished(G, c, cutoffs, g):
+    """The cutoffs of a circuit panel: every step of SectorQ's ladder from 1e-4 down that some implementation of the
+    figure finished on these nodes (the slides keep fewer, md.slide_ladder)."""
+    done = set()
+    for kind in CIRCUIT_KINDS:
+        suffix = f"n{g // 4}" if kind in ("orqa", "monoprop") else f"g{g}"
+        done.update(x for x, r in zip(cutoffs, mf.sq_runs(G, kind, c, cutoffs, suffix)) if mf.gok(r))
+    return [x for x in cutoffs if float(x) <= 1.0000001e-4 and x in done]
+
+
 def ev_circuits():
-    md.d_circuits_all()
-    comparison_panels(CAUGHT.pop("d_circuits_all"), "ev_circuits")
+    """Seven circuits on 16 GPUs: SectorQ, cuPauliProp's two modes, ORQA and MonoProp on the same four nodes, and
+    paulistrings-rs (its own truncation rule), at every cutoff that one of them finished."""
+    md.circuits16("d_circuits_all", kinds=CIRCUIT_KINDS, keep=every_finished)
+    fig = CAUGHT.pop("d_circuits_all")
+    for ax in panels_of(fig):                       # six lines leave no room for printed ratios: the text states them
+        for label in list(ax.texts):
+            label.remove()
+    for leg in fig.legends:
+        for label in leg.get_texts():
+            if label.get_text().startswith("N×:"):
+                label.set_text("")
+    comparison_panels(fig, "ev_circuits")
 
 
 def ev_cost():
@@ -638,8 +662,14 @@ def ev_knobs():
 
 
 def ev_weak():
+    """Two panels per row: every point has its GPU count, and the cutoff stands below every second count (the ten
+    cutoffs of a panel do not fit side by side; ScaleQsim's "# of GPUs (Cutoff)")."""
     md.d_weak()
-    split(CAUGHT.pop("d_weak"), "ev_weak", 3, drop_minor=True, xlabel="# of GPUs")
+    fig = CAUGHT.pop("d_weak")
+    for ax in panels_of(fig):
+        ax._paper_keep_minor = True
+        ax._paper_require_all_xticks = True
+    split(fig, "ev_weak", 2, xlabel="# of GPUs (Cutoff)")
 
 
 def ev_scaleout():
@@ -648,19 +678,22 @@ def ev_scaleout():
 
 
 def ev_circuits128():
-    md.circuits_big(128, original_baseline=True)
+    """Seven circuits on 128 GPUs (32 nodes), the implementations of Figure ev_circuits; cuPauliProp on the original
+    circuit. paulistrings-rs needs more than 64 partitions here (the build with P_MAX_BITS 8, jobs/p_drive.py)."""
+    ladder = ("1e-4", "3e-5", "1e-5", "5e-6", "3e-6", "2e-6", "1e-6", "7e-7", "5e-7", "3e-7", "2e-7", "1e-7", "7e-8", "5e-8", "3e-8")
+    names = {c: t.replace("\n", " ") for c, t in mf.G7}
+    circuits = [(c, names[c]) for c in ("ki", "tfim", "noise", "tfimsq", "xxz", "qaoa", "hea")]      # the order of ev_circuits
+    md.circuits_big(128, ladder=ladder, original_baseline=True, circuits=circuits, kinds=CIRCUIT_KINDS)
     fig = CAUGHT.pop("d_circuits_g128")
     for ax in panels_of(fig):
-        # The ratios are stated in the text; keep the new narrow panels legible.
-        for label in list(ax.texts):
+        for label in list(ax.texts):                # the ratios are stated in the text
             label.remove()
-        lo, hi = ax.get_ylim()
-        ax.set_yticks([y for y in (1, 10, 100, 1000, 10000) if lo <= y <= hi])
+        ax.set_ylim(0.1, 3000)
     for leg in fig.legends:
         for label in leg.get_texts():
             if label.get_text().startswith("N×:"):
                 label.set_text("")
-    split(fig, "ev_circuits128", 3, size=(PLACE[3][0], 2.3))
+    comparison_panels(fig, "ev_circuits128")
 
 
 def ev_fixed_rows():
@@ -852,7 +885,13 @@ def strong_run(G, big, g, kind, x):
     """(seconds or None, measured failure) of kicked Ising at cutoff x on g GPUs, for the strong-scaling panels.
     16 GPUs: campaign g (SectorQ of campaign r, cuPauliProp on the original circuit of campaign o, the fastest
     deferred interval, the CPU implementations on four nodes). 32-256 GPUs: as Figure 10 (circuits_big with the
-    original-circuit baseline): SectorQ with its default settings, then the wider runs of the ladder at 1e-6."""
+    original-circuit baseline): SectorQ with its default settings, then the wider runs of the ladder at 1e-6.
+    paulistrings-rs: its own truncation rule, one GPU per rank (queue_p)."""
+    if kind == "prs":
+        s = mf.prs_rec("ki", x, g)
+        if s is None or s.get("status") == "skipped_after_failure":
+            return None, False
+        return (s["wall"], False) if mf.gok(s) else (None, True)
     if g == 16:
         s = {"ours": G.get(f"eng.ki.{x}.g16"), "cupp": G.get(f"cupp.ki.{x}.g16"), "defer": mf.gdeferred(G, "ki", x, 16),
              "orqa": G.get(f"orqa.ki.{x}.n4"), "monoprop": G.get(f"monoprop.ki.{x}.n4")}[kind]
@@ -882,7 +921,7 @@ def ev_strong():
     over the SectorQ time where both finished."""
     G, big = md.campaign(), md.scaling_jobs()
     fig, axes = plt.subplots(1, len(STRONG_GPUS), figsize=(5.2 * len(STRONG_GPUS), 4.9))
-    kinds = ("ours", "cupp", "defer", "orqa", "monoprop")
+    kinds = ("ours", "cupp", "defer", "orqa", "monoprop", "prs")
     for ax, g in zip(axes, STRONG_GPUS):
         rows = {k: [strong_run(G, big, g, k, x) for x in STRONG_CUTS] for k in kinds}
         n = max(i + 1 for i in range(len(STRONG_CUTS)) if any(rows[k][i][0] for k in kinds))
@@ -914,8 +953,43 @@ def ev_strong():
     split(fig, "ev_strong", 2, xlabel="Cutoff (Speedup of SectorQ)", ylabel="Time (s)")
 
 
+def ev_sectorcount():
+    """Sector count on 16 GPUs (analysis/paper_n2count_summary.py, campaign full-20261109T060832Z): per cutoff, the mean
+    time over the five seed blocks of the adaptive count, 16 fixed sectors (one per GPU) and the fastest fixed count
+    of each workload (16-256, chosen after the runs); the whiskers span the five blocks."""
+    data = json.load(open(os.path.join(os.path.dirname(HERE), "analysis", "paper_n2count_summary.json")))
+    names = {"ki": "KI", "tfim": "TFIM\nHH", "noise": "Noisy\nKI", "tfimsq": "TFIM\n11×11", "xxz": "XXZ", "qaoa": "QAOA", "hea": "Ansatz"}
+    series = (("adaptive", "Adaptive count (SectorQ)", mf.SQ["ours"][0], "o", -0.22),
+              ("fixed16", "16 fixed sectors", "#7f7f7f", "s", 0.0),
+              ("best", "Fastest fixed count of each workload", "#2ca02c", "D", 0.22))
+    fig, axes = plt.subplots(1, 3)
+    for ax, x in zip(axes, ("1e-4", "1e-5", "3e-6")):
+        ws = {w["circuit"]: w for w in data["workloads"] if w["cutoff"] == x}
+        order = [c for c in names if c in ws]
+        for key, label, col, mk, dx in series:
+            for i, c in enumerate(order):
+                w = ws[c]
+                p = w["best_fixed_policy"] if key == "best" else key
+                vals, mean = w["blocks"][p], w["mean"][p]
+                ax.errorbar(i + dx, mean, yerr=[[mean - min(vals)], [max(vals) - mean]], color=col, marker=mk, markersize=7,
+                            linestyle="none", elinewidth=1.4, capsize=2.5, label=label if i == 0 else None, zorder=4 if key == "adaptive" else 3)
+        mf.sq_axes(ax, None, None, size=14)               # log y axis with plain numbers, as the other time panels
+        ax.set_xticks(range(len(order)))
+        ax.set_xticklabels([names[c] for c in order])
+        ax.set_xlim(-0.5, len(order) - 0.5)
+        ax.set_title(f"Cutoff {x}")
+        ax.set_xlabel("Circuit")
+        ax.set_ylabel("Time (s)")
+        lo, hi = ax.get_ylim()                          # at least two labeled times in the narrow range of cutoff 1e-4
+        ax.set_yticks([v for v in (0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500) if lo <= v <= hi])
+    # markers in the legend (the handles of errorbar() draw the whisker only)
+    proxies = [plt.Line2D([], [], color=col, marker=mk, markersize=7, linestyle="none") for _, _, col, mk, _ in series]
+    fig.legend(proxies, [label for _, label, _, _, _ in series])
+    split(fig, "ev_sectorcount", 2, xlabel="Circuit", ylabel="Time (s)")          # seven circuit names need two panels per row
+
+
 FIGURES = [bg_anatomy, bg_accuracy, bg_windows, ev_single, ev_circuits, ev_cost, ev_prs, ev_size, ev_accuracy, ev_breakdown, ev_variability,
-           ev_staircase, ev_knobs, ev_weak, ev_scaleout, ev_strong, ev_fixed_rows, ev_large_time, ev_circuits128, ev_runtime, ev_resector]
+           ev_staircase, ev_knobs, ev_weak, ev_scaleout, ev_strong, ev_fixed_rows, ev_large_time, ev_circuits128, ev_runtime, ev_resector, ev_sectorcount]
 
 if __name__ == "__main__":
     want = [a for a in ARGS if not a.startswith("-")]
