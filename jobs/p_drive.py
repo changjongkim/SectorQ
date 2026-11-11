@@ -17,6 +17,13 @@ import time
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 Q, LOGS = os.path.join(ROOT, "queue_p", "done"), os.path.join(ROOT, "logs", "p")
 PY = os.path.join(ROOT, "third_party", "paulistrings-rs", ".venv", "bin", "python")
+# 128 and 256 ranks: the library allows at most 2^P_MAX_BITS = 64 partitions. The copy paulistrings-rs-p8 raises
+# P_MAX_BITS from 6 to 8 and widens the in-process transport's 64-bit rank mask (uncommitted diff in that tree;
+# rows for 1-6 bits are unchanged). Used for mg128, mg256 and the check run p.p8chk.* (same point as p.mg64.ki.5e-6
+# with the new build, which a newer Rust compiler built).
+PY8 = os.path.join(ROOT, "third_party", "paulistrings-rs-p8", ".venv", "bin", "python")
+P8_MODES = ("mg128", "mg256")
+P8_CHECK = ("p.p8chk.mg64.ki.5e-6", "mg64", "ki", "5e-6")
 CUTS = ("1e-3", "1e-4", "3e-5", "1e-5", "3e-6", "1e-6")
 SOME = ("g1", "g4", "mg16", "m16", "mg32", "mg64")   # the other six circuits: one GPU, one node, 4/8/16 nodes on GPUs, four nodes on the host
 # circuit: (--case of jobs/p_ki.py, cutoffs of its ladder, modes); kicked Ising uses the library's own builder
@@ -112,6 +119,7 @@ def runs():
             for g, m in WEAK_MODE.items():
                 if (m, c, cut[g]) not in have:             # a point of the sweep already measures it
                     out.append((f"p.weak{load}.{m}.{c}.{cut[g]}", m, c, cut[g]))
+    out.insert(0, P8_CHECK)
     return out
 
 
@@ -150,7 +158,10 @@ def launch(rid, m, c, x, job, host, nccl):
     """One run with one NCCL version; returns its record."""
     what, place, args = MODES[m]
     where = host if place.startswith("-N 1 ") else ""
-    cmd = ENV.replace("{nccl}", nccl) + f"srun --jobid={job} --overlap {place}{where} --kill-on-bad-exit=1 {PY} {ROOT}/jobs/p_ki.py --cutoff {x} {args}" + (f" --case {CIRCUITS[c][0]}" if CIRCUITS[c][0] else "")
+    py = PY8 if (m in P8_MODES or rid.startswith("p.p8chk.")) else PY
+    # communicator setup over 128/256 ranks: a longer bound on each wire wait than the library's 300 s
+    wait = "export PAULISTRINGS_NCCL_TIMEOUT_S=900; " if m in P8_MODES else ""
+    cmd = ENV.replace("{nccl}", nccl) + wait + f"srun --jobid={job} --overlap {place}{where} --kill-on-bad-exit=1 {py} {ROOT}/jobs/p_ki.py --cutoff {x} {args}" + (f" --case {CIRCUITS[c][0]}" if CIRCUITS[c][0] else "")
     log = os.path.join(LOGS, rid + ".out")
     t0 = time.time()
     with open(log, "w") as f:
