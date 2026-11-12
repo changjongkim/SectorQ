@@ -165,6 +165,23 @@ def qubits():
         print(f"  {L * L} qubits: SectorQ {e and e.get('status')} {e and e.get('wall')} {e and e.get('limit_note', '')}; cuPP {c and c.get('status')} {c and c.get('wall')}")
 
 
+def runtime_profiles():
+    print("== time shares of the 64- and 256-GPU profiles (Figure ev_runtime, analysis/paper_runtime_profiles.json)")
+    import json
+    rows = json.load(open(os.path.join(os.path.dirname(FIG), "analysis", "paper_runtime_profiles.json")))
+    share = lambda r, k: 100 * r[k] / r["wall"]
+    rng2 = lambda v: f"{min(v):.0f}-{max(v):.0f}%"
+    for g in (64, 256):
+        done = [r for r in rows if r["gpus"] == g and r["status"] == "complete"]
+        small = [r for r in done if r["point"] == 0]
+        large = [r for r in done if r["point"] == 2]
+        print(f"  {g} GPUs: small reference idle {rng2([share(r, 'idle') for r in small])}, "
+              f"largest points library calls {rng2([share(r, 'operations') for r in large])}, "
+              f"exchange {rng2([share(r, 'exchange') for r in large])}, idle {max(share(r, 'idle') for r in large):.1f}% at most")
+    small = [r for r in rows if r["gpus"] in (64, 256) and r["point"] == 0 and r["status"] == "complete"]
+    print(f"  64 and 256 GPUs: small reference idle {rng2([share(r, 'idle') for r in small])} over {len(small)} profiles")
+
+
 if __name__ == "__main__":
     single()
     weak()
@@ -173,3 +190,4 @@ if __name__ == "__main__":
     circuits128()
     xxz_splits128()
     qubits()
+    runtime_profiles()

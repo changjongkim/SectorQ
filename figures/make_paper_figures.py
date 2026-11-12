@@ -669,7 +669,7 @@ def ev_weak():
     for ax in panels_of(fig):
         ax._paper_keep_minor = True
         ax._paper_require_all_xticks = True
-    split(fig, "ev_weak", 2, xlabel="# of GPUs (Cutoff)")
+    split(fig, "ev_weak", 2, xlabel="# of GPUs (Cutoff)", size=(4.5, 1.7))   # 1.0 in printed, guide Section 8
 
 
 def ev_scaleout():
@@ -950,7 +950,7 @@ def ev_strong():
             seen.setdefault(l, h)
     order = [mf.SQ_NAME[k] for k in kinds if mf.SQ_NAME[k] in seen]
     fig.legend([seen[l] for l in order], order)
-    split(fig, "ev_strong", 2, xlabel="Cutoff (Speedup of SectorQ)", ylabel="Time (s)")
+    split(fig, "ev_strong", 2, xlabel="Cutoff (Speedup of SectorQ)", ylabel="Time (s)", size=(4.5, 1.7))   # 1.0 in printed, guide Section 8
 
 
 def ev_sectorcount():
