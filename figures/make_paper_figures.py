@@ -661,11 +661,20 @@ def ev_knobs():
     split(fig, "ev_knobs", 3)
 
 
+PAPER_MAX_GPUS = 256       # outside the Extreme Scale-Out section the paper stops at 256 GPUs (user, 2026-11-12)
+
+
 def ev_weak():
     """Three panels per row (one per circuit): the GPU counts alone on the x axis (the first and the last always,
     every second count where the ten do not fit), and the text of the paper states the cutoff schedule (2e-5 on one
-    GPU to 8e-7 on 512 GPUs for the large load), since the cutoffs below the counts do not fit a third of the width."""
-    md.d_weak()
+    GPU to 1.15e-6 on 256 GPUs for the large load), since the cutoffs below the counts do not fit a third of the width.
+    The paper shows 512 GPUs only in its Extreme Scale-Out section (user, 2026-11-12), so the counts end at 256."""
+    keep = mf.BIG_WEAK, mf.BIG_WEAK_S
+    mf.BIG_WEAK, mf.BIG_WEAK_S = ({g: x for g, x in d.items() if g <= PAPER_MAX_GPUS} for d in keep)
+    try:
+        md.d_weak()
+    finally:
+        mf.BIG_WEAK, mf.BIG_WEAK_S = keep
     fig = CAUGHT.pop("d_weak")
     for ax in panels_of(fig):
         ax.set_xticklabels([], minor=True)

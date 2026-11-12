@@ -10,6 +10,7 @@ compare runs that keep different numbers of terms (as for MonoProp).
   ../env/bin/python3 analysis/paper_eval_numbers.py
 """
 import os
+import re
 import sys
 
 import matplotlib
@@ -177,7 +178,8 @@ def runtime_profiles():
         large = [r for r in done if r["point"] == 2]
         print(f"  {g} GPUs: small reference idle {rng2([share(r, 'idle') for r in small])}, "
               f"largest points library calls {rng2([share(r, 'operations') for r in large])}, "
-              f"exchange {rng2([share(r, 'exchange') for r in large])}, idle {max(share(r, 'idle') for r in large):.1f}% at most")
+              f"exchange {rng2([share(r, 'exchange') for r in large])}, GPU-host copies {rng2([share(r, 'copies') for r in large])}, "
+              f"idle {max(share(r, 'idle') for r in large):.1f}% at most")
     small = [r for r in rows if r["gpus"] in (64, 256) and r["point"] == 0 and r["status"] == "complete"]
     print(f"  64 and 256 GPUs: small reference idle {rng2([share(r, 'idle') for r in small])} over {len(small)} profiles")
 
@@ -200,8 +202,37 @@ def weak_efficiency():
         if rec and rec.get("checks"):
             rate.setdefault(title, {})[g] = float(rec["checks"]) / s["wall"] / g
     for g in sorted({g for d in rate.values() for g in d}):
+        if g > 256:                                  # the paper shows 512 GPUs only in its Extreme Scale-Out section
+            continue
         e = [100 * d[g] / d[1] for d in rate.values() if g in d and 1 in d]
         print(f"  {g:3d} GPUs: {min(e):.0f}-{max(e):.0f}% over {len(e)} circuits")
+    # idle time at window boundaries until the slowest node finishes (the "waiting" part of the trace), large load
+    for g in (64, 256):
+        w = [100 * mf.big_run(big, c, mf.BIG_WEAK[g], g)["parts"]["waiting"] / mf.big_run(big, c, mf.BIG_WEAK[g], g)["wall"]
+             for c, _ in mf.G3]
+        print(f"  {g:3d} GPUs: nodes idle at window boundaries for {min(w):.0f}-{max(w):.0f}% of the wall time")
+
+
+def cap256():
+    print("== kicked Ising 3e-6 on 256 GPUs: performance setting against a 1,024-sector cap (Sections 4.6 and 4.9)")
+    import make_eval_figures as mf
+    big = md.scaling_jobs()
+    for tag, log in (("performance setting (cap 256)", "s/i.ref.ki.3e-6.g256.out"), ("cap 1,024", "s/n.eng10.ki.3e-6.g256.out")):
+        r = next(r for r in big if r["log"] == log and mf.ok(r))
+        p = r["parts"]
+        runs = re.search(r"bucket_runs=(\d+)", open(os.path.join(os.path.dirname(FIG), "logs", log)).read()).group(1)
+        print(f"  {tag}: {r['wall']:.1f} s, worker idle {100 * p['idle'] / p['workers'] / r['wall']:.0f}%, "
+              f"{int(runs):,} sector tasks, binary {r.get('binary')}")
+
+
+def ki_values():
+    print("== kicked Ising expectation values at the low cutoffs, 256 GPUs or fewer (Section 4.8)")
+    import make_eval_figures as mf
+    big = md.scaling_jobs()
+    for x in (1e-6, 7e-7, 5e-7, 3e-7, 2e-7):
+        v = {round(r["value"], 6) for r in big if r["kind"] == "engine" and r["circuit"] == "ki_lab" and r["gpus"] <= 256
+             and r["coef"] == x and mf.ok(r)}
+        print(f"  {x:.0e}: {sorted(v)}")
 
 
 if __name__ == "__main__":
@@ -214,3 +245,5 @@ if __name__ == "__main__":
     qubits()
     runtime_profiles()
     weak_efficiency()
+    cap256()
+    ki_values()
