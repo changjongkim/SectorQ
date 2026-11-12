@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Run list of the review experiments of 2026-11-12 (queue_y, logs/y), all with bin/pp_engine_k on at most four nodes.
+"""Run list of the review experiments of 2026-11-12 (queue_y, logs/y), all with bin/pp_engine_k2 on at most four nodes
+(the one-node E3 runs and the first E1 re runs ran on pp_engine_k, the same code for them).
 
   python3 jobs/y_items.py            writes queue_y/todo_y.jsonl (the runner keeps finished runs in queue_y/done)
 
@@ -20,7 +21,7 @@ import os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 Q = os.path.join(ROOT, "queue_y")
-BIN = "bin/pp_engine_k"
+BIN = "bin/pp_engine_k2"     # pp_engine_k with --fixed-rows 2 rows that divide the terms (k gave one sector)
 
 CIRC = {
     "ki": ("--circuit ki_lab --weight 0 --target 6000000", 127),

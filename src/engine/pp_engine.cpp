@@ -290,13 +290,25 @@ static double largestCosetShare(const std::vector<uint64_t>& sample, const Span&
   return (double)best / (double)key.size();
 }
 
-// --fixed-rows 2: rows chosen before the run with the whole circuit in view. The distinct generators of the branching
-// rotations from position b on (at position b) enter a span in decreasing order of the number of rotations that use
-// them; a generator that would leave fewer than `need` rows is skipped. A rotation whose generator lies in the span
-// changes none of its annihilator's rows, so every rotation counted in *conserved runs inside a window.
+// --fixed-rows 2: rows chosen at position b with the rest of the circuit in view. The terms at b differ only by the
+// generators of the rotations before b (span A), so a row orthogonal to A gives every term the same label: rows conserved
+// by the whole circuit divide nothing. The generators from b on enter a span S by decreasing number of rotations that use
+// them; one that lies in S + A enters only while dim(S + A) - dim(S) stays above need + 4, so that the annihilator of S
+// keeps need + 4 directions that are not constant on the terms at b. Returns representatives of those directions (rows
+// of the annihilator of S that are independent modulo the annihilator of S + A): every combination divides the terms.
 static std::vector<BV> oracleRows(int b, int need, int* conserved, int* total) {
-  const int M = (int)g_ops.size(), n2 = 2 * g_L.n;
-  std::map<BV, std::pair<int, int>> uses;             // generator -> (rotations, first operation)
+  const int M = (int)g_ops.size();
+  Span S, SA; S.L = g_L; SA.L = g_L;
+  {
+    std::vector<BV> before;                              // generators of the rotations before b, carried to position b
+    for (int k = 0; k < b; k++) {
+      const Op& op = g_ops[k];
+      if (op.type == OP_ROT && op.branches) before.push_back(op.gen);
+      else if (changesBits(op)) for (auto& v : before) mapVec(op, v.data(), g_L);
+    }
+    for (auto& v : before) SA.add(v);
+  }
+  std::map<BV, std::pair<int, int>> uses;             // generator at position b -> (rotations, first operation)
   std::vector<int> maps;
   for (int k = b; k < M; k++) {
     const Op& op = g_ops[k];
@@ -312,14 +324,21 @@ static std::vector<BV> oracleRows(int b, int need, int* conserved, int* total) {
   std::vector<std::pair<BV, std::pair<int, int>>> order(uses.begin(), uses.end());
   std::sort(order.begin(), order.end(), [](const std::pair<BV, std::pair<int, int>>& x, const std::pair<BV, std::pair<int, int>>& y) {
     return x.second.first != y.second.first ? x.second.first > y.second.first : x.second.second < y.second.second; });
-  Span S; S.L = g_L;
+  const int slack = need + 4;
   for (auto& e : order) {
     BV t = e.first;
-    if (S.reduce(t) && S.dim() + 1 <= n2 - need) S.add(e.first);
+    if (!S.reduce(t)) continue;                        // already conserved
+    BV u = e.first;
+    if (SA.reduce(u)) { S.add(e.first); SA.add(e.first); }          // a new direction: the margin stays
+    else if (SA.dim() - S.dim() > slack) S.add(e.first);           // costs one dividing direction
   }
   *conserved = 0; *total = 0;
   for (auto& e : order) { BV t = e.first; *total += e.second.first; if (!S.reduce(t)) *conserved += e.second.first; }
-  return S.annihilator();
+  std::vector<BV> annS = S.annihilator(), annSA = SA.annihilator(), reps;
+  Span Q; Q.L = g_L;
+  for (auto& v : annSA) Q.add(v);
+  for (auto& v : annS) if (Q.add(v)) reps.push_back(v);
+  return reps;
 }
 
 // Finds the window that starts at b and the rows that survive it.
@@ -421,7 +440,7 @@ static Window planWindow(int b, int gWanted, const std::vector<uint64_t>& sample
     if (o.fixedRows == 2) {
       int kept = 0, total = 0;
       from = oracleRows(b, o.gmax, &kept, &total);
-      if (g_rank == 0) printf("fixed rows from the whole circuit: %d of %d branching rotations conserve the row space of %zu rows\n",
+      if (g_rank == 0) printf("fixed rows from the rest of the circuit: %d of %d later branching rotations conserve them; %zu dividing directions\n",
                               kept, total, from.size());
     }
     auto rowOf = [&](const std::vector<BV>& basis) {

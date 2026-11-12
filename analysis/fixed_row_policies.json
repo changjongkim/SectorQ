@@ -1,0 +1,89 @@
+[
+ {
+  "circuit": "ki",
+  "rotations": 2540,
+  "windows": 20,
+  "random": 2528.0,
+  "x-only": 2536.0,
+  "z-only": 1266.0,
+  "first window": 886.2,
+  "first window at": 636,
+  "best fixed": 112.0,
+  "rotations after b": 1905,
+  "whole-circuit rows": 19
+ },
+ {
+  "circuit": "tfim",
+  "rotations": 5420,
+  "windows": 45,
+  "random": 5404.0,
+  "x-only": 2536.0,
+  "z-only": 2880.0,
+  "first window": 2412.8,
+  "first window at": 980,
+  "best fixed": 192.0,
+  "rotations after b": 4440,
+  "whole-circuit rows": 1
+ },
+ {
+  "circuit": "noise",
+  "rotations": 2540,
+  "windows": 20,
+  "random": 2528.0,
+  "x-only": 2536.0,
+  "z-only": 1266.0,
+  "whole-circuit rows": 19
+ },
+ {
+  "circuit": "tfimsq",
+  "rotations": 3410,
+  "windows": 24,
+  "random": 3396.0,
+  "x-only": 1202.0,
+  "z-only": 2190.0,
+  "first window": 1535.8,
+  "first window at": 920,
+  "best fixed": 84.0,
+  "rotations after b": 2490,
+  "whole-circuit rows": 1
+ },
+ {
+  "circuit": "xxz",
+  "rotations": 2016,
+  "windows": 23,
+  "random": 2013.6,
+  "x-only": 1336.8,
+  "z-only": 1336.8,
+  "first window": 1204.0,
+  "first window at": 358,
+  "best fixed": 706.2,
+  "rotations after b": 1658,
+  "whole-circuit rows": 2
+ },
+ {
+  "circuit": "qaoa",
+  "rotations": 1000,
+  "windows": 8,
+  "random": 996.0,
+  "x-only": 398.4,
+  "z-only": 597.6,
+  "first window": 199.6,
+  "first window at": 350,
+  "best fixed": 24.0,
+  "rotations after b": 650,
+  "whole-circuit rows": 1
+ },
+ {
+  "circuit": "hea",
+  "rotations": 3200,
+  "windows": 34,
+  "random": 3193.6,
+  "x-only": 1593.6,
+  "z-only": 3190.4,
+  "first window": 1488.2,
+  "first window at": 860,
+  "best fixed": 144.0,
+  "rotations after b": 2341,
+  "whole-circuit rows": 0
+ }
+]
