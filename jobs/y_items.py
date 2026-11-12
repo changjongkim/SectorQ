@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Run list of the review experiments of 2026-11-12 (queue_y, logs/y), all with bin/pp_engine_k2 on at most four nodes
-(the one-node E3 runs and the first E1 re runs ran on pp_engine_k, the same code for them).
+"""Run list of the review experiments of 2026-11-12 (queue_y, logs/y), all with bin/pp_engine_k3 on at most four nodes
+(the one-node E3 runs and the first E1 re runs ran on pp_engine_k or k2, the same code for them).
 
   python3 jobs/y_items.py            writes queue_y/todo_y.jsonl (the runner keeps finished runs in queue_y/done)
 
 E1  fixed rows against rows recomputed for every window, on 16 GPUs: re (recomputed, the default), fx (--fixed-rows 1: the
-    rows of the first window that divides the terms), bf (--fixed-rows 2: the rows that the most rotations of the whole
-    circuit conserve). The circuits and ladders of the former ablation (jobs/x_ablate.sh, analysis/paper_fixed_rows.json),
+    rows of the first window that divides the terms), bf (--fixed-rows 2: at the sample balance of fx, the rows that the
+    most later rotations conserve). The circuits and ladders of the former ablation (jobs/x_ablate.sh, analysis/paper_fixed_rows.json),
     rerun with one engine so that the three modes compare. Noisy kicked Ising is left out (no fixed-row mode).
 E2  the window rule: --ann-min at 1/4, 1/2 and 3/2 of the qubit count (the default is the qubit count, which E1 re
     measures), four circuits, cutoffs 1e-5 and 3e-6, 16 GPUs.
@@ -21,7 +21,7 @@ import os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 Q = os.path.join(ROOT, "queue_y")
-BIN = "bin/pp_engine_k2"     # pp_engine_k with --fixed-rows 2 rows that divide the terms (k gave one sector)
+BIN = "bin/pp_engine_k3"     # --fixed-rows 2 at the balance of --fixed-rows 1 (k: one sector; k2: 209x imbalance)
 
 CIRC = {
     "ki": ("--circuit ki_lab --weight 0 --target 6000000", 127),

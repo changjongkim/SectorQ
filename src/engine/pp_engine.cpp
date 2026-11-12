@@ -290,25 +290,11 @@ static double largestCosetShare(const std::vector<uint64_t>& sample, const Span&
   return (double)best / (double)key.size();
 }
 
-// --fixed-rows 2: rows chosen at position b with the rest of the circuit in view. The terms at b differ only by the
-// generators of the rotations before b (span A), so a row orthogonal to A gives every term the same label: rows conserved
-// by the whole circuit divide nothing. The generators from b on enter a span S by decreasing number of rotations that use
-// them; one that lies in S + A enters only while dim(S + A) - dim(S) stays above need + 4, so that the annihilator of S
-// keeps need + 4 directions that are not constant on the terms at b. Returns representatives of those directions (rows
-// of the annihilator of S that are independent modulo the annihilator of S + A): every combination divides the terms.
-static std::vector<BV> oracleRows(int b, int need, int* conserved, int* total) {
+// --fixed-rows 2: the distinct generators of the branching rotations from position b on (at position b), ordered by
+// decreasing number of rotations that use them (ties: the earlier first), with these numbers.
+static std::vector<std::pair<BV, int>> laterGenerators(int b) {
   const int M = (int)g_ops.size();
-  Span S, SA; S.L = g_L; SA.L = g_L;
-  {
-    std::vector<BV> before;                              // generators of the rotations before b, carried to position b
-    for (int k = 0; k < b; k++) {
-      const Op& op = g_ops[k];
-      if (op.type == OP_ROT && op.branches) before.push_back(op.gen);
-      else if (changesBits(op)) for (auto& v : before) mapVec(op, v.data(), g_L);
-    }
-    for (auto& v : before) SA.add(v);
-  }
-  std::map<BV, std::pair<int, int>> uses;             // generator at position b -> (rotations, first operation)
+  std::map<BV, std::pair<int, int>> uses;             // generator -> (rotations, first operation)
   std::vector<int> maps;
   for (int k = b; k < M; k++) {
     const Op& op = g_ops[k];
@@ -324,21 +310,9 @@ static std::vector<BV> oracleRows(int b, int need, int* conserved, int* total) {
   std::vector<std::pair<BV, std::pair<int, int>>> order(uses.begin(), uses.end());
   std::sort(order.begin(), order.end(), [](const std::pair<BV, std::pair<int, int>>& x, const std::pair<BV, std::pair<int, int>>& y) {
     return x.second.first != y.second.first ? x.second.first > y.second.first : x.second.second < y.second.second; });
-  const int slack = need + 4;
-  for (auto& e : order) {
-    BV t = e.first;
-    if (!S.reduce(t)) continue;                        // already conserved
-    BV u = e.first;
-    if (SA.reduce(u)) { S.add(e.first); SA.add(e.first); }          // a new direction: the margin stays
-    else if (SA.dim() - S.dim() > slack) S.add(e.first);           // costs one dividing direction
-  }
-  *conserved = 0; *total = 0;
-  for (auto& e : order) { BV t = e.first; *total += e.second.first; if (!S.reduce(t)) *conserved += e.second.first; }
-  std::vector<BV> annS = S.annihilator(), annSA = SA.annihilator(), reps;
-  Span Q; Q.L = g_L;
-  for (auto& v : annSA) Q.add(v);
-  for (auto& v : annS) if (Q.add(v)) reps.push_back(v);
-  return reps;
+  std::vector<std::pair<BV, int>> out;
+  for (auto& e : order) out.push_back({e.first, e.second.first});
+  return out;
 }
 
 // Finds the window that starts at b and the rows that survive it.
@@ -434,15 +408,12 @@ static Window planWindow(int b, int gWanted, const std::vector<uint64_t>& sample
   if (!ann.empty()) for (int i = 0; i < 32; i++) w.spare.push_back(randomRow());
   if (o.fixedRows && g_fixed.empty() && w.g > 0) {
     // The rows for the rest of the run: as many as the largest bucket count, the best-balanced set on this sample.
-    // --fixed-rows 1 draws them from the rows of this window, --fixed-rows 2 from the rows that the most rotations of the
-    // whole circuit conserve (oracleRows).
-    std::vector<BV> from;
-    if (o.fixedRows == 2) {
-      int kept = 0, total = 0;
-      from = oracleRows(b, o.gmax, &kept, &total);
-      if (g_rank == 0) printf("fixed rows from the rest of the circuit: %d of %d later branching rotations conserve them; %zu dividing directions\n",
-                              kept, total, from.size());
-    }
+    // --fixed-rows 1 draws them from the rows of this window. --fixed-rows 2 takes the balance of that choice as a limit
+    // and draws the rows from the annihilator of the longest prefix of the later generators (laterGenerators) whose best
+    // candidate set stays within the limit (binary search over the prefix length): the fixed rows that the most later
+    // rotations conserve at the balance of --fixed-rows 1. Rows conserved by every later rotation give every term one
+    // label, since the terms differ only by the generators before b.
+    const int G = std::min(o.gmax, (int)ann.size());
     auto rowOf = [&](const std::vector<BV>& basis) {
       BV r(W, 0);
       bool any = false;
@@ -450,22 +421,56 @@ static Window planWindow(int b, int gWanted, const std::vector<uint64_t>& sample
         for (auto& a : basis) if (rowRng() & 1ULL) { any = true; for (int x = 0; x < W; x++) r[x] ^= a[x]; }
       return r;
     };
-    const int G = std::min(o.gmax, (int)(o.fixedRows == 2 ? from.size() : ann.size()));
+    auto bestOf = [&](auto draw, std::vector<uint64_t>& out) {
+      double mxBest = 1e300;
+      for (int c = 0; c < std::max(1, o.cands); c++) {
+        std::vector<uint64_t> rows((size_t)G * W, 0);
+        for (int j = 0; j < G; j++) { BV r = draw(); std::copy(r.begin(), r.end(), rows.begin() + (size_t)j * W); }
+        std::vector<long> h((size_t)1 << G, 0);
+        for (size_t i = 0; i < ns; i++) h[ownerCpu(&sample[i * W], rows, G)]++;
+        const double mx = ns ? (double)*std::max_element(h.begin(), h.end()) : 0;
+        if (mx < mxBest) { mxBest = mx; out = rows; }
+      }
+      return mxBest;
+    };
     std::vector<uint64_t> best;
-    double bestMx = 1e300;
-    for (int c = 0; c < std::max(1, o.cands); c++) {
-      std::vector<uint64_t> rows((size_t)G * W, 0);
-      for (int j = 0; j < G; j++) { BV r = o.fixedRows == 2 ? rowOf(from) : randomRow(); std::copy(r.begin(), r.end(), rows.begin() + (size_t)j * W); }
-      std::vector<long> h((size_t)1 << G, 0);
-      for (size_t i = 0; i < ns; i++) h[ownerCpu(&sample[i * W], rows, G)]++;
-      const double mx = ns ? (double)*std::max_element(h.begin(), h.end()) : 0;
-      if (mx < bestMx) { bestMx = mx; best = rows; }
+    double bestMx = bestOf(randomRow, best);
+    if (o.fixedRows == 2) {
+      const auto later = laterGenerators(b);
+      const int n2 = 2 * g_L.n;
+      auto prefixSpan = [&](int p) {
+        Span S; S.L = g_L;
+        for (int i = 0; i < p; i++) { BV t = later[i].first; if (S.reduce(t) && S.dim() + 1 <= n2 - G) S.add(later[i].first); }
+        return S;
+      };
+      auto evalPrefix = [&](int p, std::vector<uint64_t>& rows) {
+        const std::vector<BV> basis = prefixSpan(p).annihilator();
+        if ((int)basis.size() < G) return 1e300;
+        return bestOf([&]() { return rowOf(basis); }, rows);
+      };
+      const double limit = bestMx;
+      int lo = 0, hi = (int)later.size();
+      std::vector<uint64_t> loRows;
+      double loMx = evalPrefix(0, loRows);
+      while (lo < hi) {
+        const int mid = (lo + hi + 1) / 2;
+        std::vector<uint64_t> r;
+        const double m = evalPrefix(mid, r);
+        if (m <= limit) { lo = mid; loRows = r; loMx = m; } else hi = mid - 1;
+      }
+      best = loRows; bestMx = loMx;
+      const Span S = prefixSpan(lo);
+      long kept = 0, total = 0;
+      for (auto& e : later) { BV t = e.first; total += e.second; if (!S.reduce(t)) kept += e.second; }
+      if (g_rank == 0) printf("fixed rows conserved by the most later rotations at the balance of --fixed-rows 1: prefix of %d of %zu "
+                              "generators; %ld of %ld later branching rotations conserve them\n", lo, later.size(), kept, total);
     }
     for (int j = 0; j < G; j++) g_fixed.emplace_back(best.begin() + (size_t)j * W, best.begin() + (size_t)(j + 1) * W);
     for (int j = 0; j < w.g; j++) std::copy(g_fixed[j].begin(), g_fixed[j].end(), w.rows.begin() + (size_t)j * W);
     if (g_rank == 0) printf("fixed rows: %d chosen at operation %d (largest of %d buckets on the sample: %.3f of the mean)\n",
                             G, b, 1 << G, ns ? bestMx * (double)(1 << G) / (double)ns : 0.0);
-    // Rows of the whole circuit need not be conserved by this window: it ends at the first rotation that changes one.
+    // Rows chosen for the rest of the circuit need not be conserved by this window: it ends at the first rotation that
+    // changes one.
     if (o.fixedRows == 2) { Window f = planFixed(b, gWanted, o, rng); f.predShare = ns ? bestMx / (double)ns : -1; return f; }
   }
   return w;
