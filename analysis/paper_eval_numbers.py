@@ -143,6 +143,20 @@ def circuits128():
         print("   ", c, {k: deepest(rows.get((c, k), {})) for k in KINDS}, "SectorQ deepest time %.0f s" % rows[c, "ours"][deepest(rows[c, "ours"])])
 
 
+def xxz_splits128():
+    print("== XXZ on 128 GPUs: sector divisions and waiting for the slowest node (engine logs)")
+    import json
+    import re
+    for x in ("3e-6", "2e-6", "1e-6", "7e-7"):
+        rec = json.load(open(os.path.join(os.path.dirname(FIG), "queue_s", "done", f"eng.xxz.{x}.g128")))
+        t = open(os.path.join(os.path.dirname(FIG), rec["log"])).read()
+        g, h = (int(v) for v in re.search(r"splits_on_gpu=(\d+) splits_on_host=(\d+)", t).groups())
+        wall = float(re.search(r"^wall=([\d.]+) s", t, re.M)[1])
+        wait = float(re.search(r"waiting for the slowest node=([\d.]+)", t)[1])
+        print(f"  {x}: {rec.get('bin', 'pp_engine_i')} wall {wall:.1f} s, divisions {g} on GPUs + {h} on hosts = {g + h}, "
+              f"waiting for the slowest node {wait:.1f} s ({100 * wait / wall:.0f}% of the wall)")
+
+
 def qubits():
     print("== qubit sweep at 1e-4 (Figure ev_size)")
     G = md.campaign()
@@ -157,4 +171,5 @@ if __name__ == "__main__":
     strong()
     circuits16()
     circuits128()
+    xxz_splits128()
     qubits()
