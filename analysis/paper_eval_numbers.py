@@ -182,6 +182,28 @@ def runtime_profiles():
     print(f"  64 and 256 GPUs: small reference idle {rng2([share(r, 'idle') for r in small])} over {len(small)} profiles")
 
 
+def weak_efficiency():
+    print("== weak scaling, large load (Figure ev_weak d-f): boundary-term throughput per GPU relative to one GPU")
+    # Work is the number of term checks of the integrity line (terms at the window boundaries summed over the run),
+    # as in analysis/scaling_table.py; efficiency = work / wall / GPUs over the same quantity on one GPU.
+    import make_eval_figures as mf
+    G, big = md.campaign(), md.scaling_jobs()
+    fig, ax = plt.subplots(3, 2)
+    rows = mf.g_weak(G, big, axes=[[ax[j][0], ax[j][1]] for j in range(3)])
+    plt.close(fig)
+    names = {t: c for c, t in mf.G3}
+    rate = {}
+    for load, title, kind, g, x, s in rows:
+        if load != "L" or kind != mf.SQ_NAME["ours"] or not mf.gok(s):
+            continue
+        rec = mf.big_run(big, names[title], x, g) if g > 16 else mf.gdetail(s)
+        if rec and rec.get("checks"):
+            rate.setdefault(title, {})[g] = float(rec["checks"]) / s["wall"] / g
+    for g in sorted({g for d in rate.values() for g in d}):
+        e = [100 * d[g] / d[1] for d in rate.values() if g in d and 1 in d]
+        print(f"  {g:3d} GPUs: {min(e):.0f}-{max(e):.0f}% over {len(e)} circuits")
+
+
 if __name__ == "__main__":
     single()
     weak()
@@ -191,3 +213,4 @@ if __name__ == "__main__":
     xxz_splits128()
     qubits()
     runtime_profiles()
+    weak_efficiency()

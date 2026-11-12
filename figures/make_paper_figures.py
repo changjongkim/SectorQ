@@ -662,14 +662,15 @@ def ev_knobs():
 
 
 def ev_weak():
-    """Two panels per row: every point has its GPU count, and the cutoff stands below every second count (the ten
-    cutoffs of a panel do not fit side by side; ScaleQsim's "# of GPUs (Cutoff)")."""
+    """Three panels per row (one per circuit): the GPU counts alone on the x axis (the first and the last always,
+    every second count where the ten do not fit), and the text of the paper states the cutoff schedule (2e-5 on one
+    GPU to 8e-7 on 512 GPUs for the large load), since the cutoffs below the counts do not fit a third of the width."""
     md.d_weak()
     fig = CAUGHT.pop("d_weak")
     for ax in panels_of(fig):
-        ax._paper_keep_minor = True
-        ax._paper_require_all_xticks = True
-    split(fig, "ev_weak", 2, xlabel="# of GPUs (Cutoff)", size=(4.5, 1.7))   # 1.0 in printed, guide Section 8
+        ax.set_xticklabels([], minor=True)
+        ax.tick_params(axis="x", which="minor", length=0, pad=0)
+    split(fig, "ev_weak", 3, xlabel="# of GPUs", size=(2.95, 1.7))   # 1.0 in printed, guide Section 8
 
 
 def ev_scaleout():
