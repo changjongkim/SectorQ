@@ -317,6 +317,32 @@ inline Problem makeHea(int n, int layers, int seed, double ampOverPi, int obsQ, 
   return P;
 }
 
+// Random k-local Pauli rotations (experiment E5 of the 2026-11-12 review plan): each layer rotates n generators, each on k
+// distinct qubits drawn uniformly from all n, with letters X, Y or Z drawn uniformly, by an angle uniform in
+// [-amp*pi, amp*pi]. No Clifford gates. A larger k makes the generators more diverse, so that a window reaches the rank
+// limit after fewer rotations.
+inline Problem makeRandomPauli(int n, int layers, int k, int seed, double ampOverPi, int obsQ, int truncEvery) {
+  Problem P; P.name = "random " + std::to_string(k) + "-local Pauli rotations"; P.L = makeLayout(n);
+  std::mt19937_64 rng(seed);
+  std::uniform_real_distribution<double> u(-ampOverPi * PI_, ampOverPi * PI_);
+  std::uniform_int_distribution<int> letter(0, 2);
+  const cupaulipropPauliKind_t kinds[3] = {CUPAULIPROP_PAULI_X, CUPAULIPROP_PAULI_Y, CUPAULIPROP_PAULI_Z};
+  std::vector<int32_t> all(n);
+  for (int q = 0; q < n; q++) all[q] = q;
+  for (int l = 0; l < layers; l++)
+    for (int r = 0; r < n; r++) {
+      std::shuffle(all.begin(), all.end(), rng);
+      std::vector<int32_t> q(all.begin(), all.begin() + k);
+      std::sort(q.begin(), q.end());
+      std::vector<cupaulipropPauliKind_t> p(k);
+      for (auto& x : p) x = kinds[letter(rng)];
+      P.ops.push_back(rot(q, p, u(rng)));
+    }
+  singleZ(P, obsQ);
+  finalize(P, truncEvery);
+  return P;
+}
+
 // ---------------------------------------------------------------- Clifford frame
 // A Hermitian Pauli string with a sign.
 struct SignedPauli { BV bits; int sign = 1; };

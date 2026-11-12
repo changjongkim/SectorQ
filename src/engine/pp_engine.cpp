@@ -34,6 +34,8 @@
 // --mode cupp  same operation list through cuPauliProp's own distributed mode (one rank per GPU)
 
 #include <cupauliprop.h>
+#include <map>
+#include <numeric>
 #include <cuda_runtime.h>
 #include <mpi.h>
 
@@ -144,6 +146,9 @@ struct Opts {
   int overlapPlan = 1;           // several GPUs: choose the rows of the next window while this window runs
   double longWindow = 0.5;       // perGpu buckets per GPU only when the last window ran at least this long (s); else one
   std::string ckptFile, resume;
+  int planOnly = 0;              // print the windows of the circuit (no sample, no GPU) and stop
+  std::string dumpGens;          // write the generators of the branching rotations at position 0 to this file and stop
+  int locality = 2;              // --circuit rpauli: qubits per rotation
   int ckptWindow = -1, stopAtCkpt = 0;
   std::string profile;           // write the number of terms before every operation to this file
   int deferDedup = 0;            // k > 0: inside a bucket, merge equal strings only every k operations and before each truncation
@@ -247,6 +252,7 @@ struct Window {
   std::vector<BV> spare;            // further rows of the same window, for splitting
   int annDim = 0, generators = 0;
   double cosetFrac = 0;             // share of the sample in the largest coset of the generator span
+  double predShare = -1;            // share of the sample in the largest of the 2^g labels of the chosen rows (rank 0)
   int lastBreaks = 0;               // --fixed-rows: the last operation changes a fixed row; its truncation waits for the exchange
 };
 
@@ -282,6 +288,38 @@ static double largestCosetShare(const std::vector<uint64_t>& sample, const Span&
   size_t best = 0, run = 0;
   for (size_t i = 0; i < key.size(); i++) { run = (i && key[i] == key[i - 1]) ? run + 1 : 1; best = std::max(best, run); }
   return (double)best / (double)key.size();
+}
+
+// --fixed-rows 2: rows chosen before the run with the whole circuit in view. The distinct generators of the branching
+// rotations from position b on (at position b) enter a span in decreasing order of the number of rotations that use
+// them; a generator that would leave fewer than `need` rows is skipped. A rotation whose generator lies in the span
+// changes none of its annihilator's rows, so every rotation counted in *conserved runs inside a window.
+static std::vector<BV> oracleRows(int b, int need, int* conserved, int* total) {
+  const int M = (int)g_ops.size(), n2 = 2 * g_L.n;
+  std::map<BV, std::pair<int, int>> uses;             // generator -> (rotations, first operation)
+  std::vector<int> maps;
+  for (int k = b; k < M; k++) {
+    const Op& op = g_ops[k];
+    if (op.type == OP_ROT && op.branches) {
+      BV v = op.gen;
+      for (int j = (int)maps.size() - 1; j >= 0; --j) mapVec(g_ops[maps[j]], v.data(), g_L);
+      auto it = uses.find(v);
+      if (it == uses.end()) uses[v] = {1, k}; else it->second.first++;
+    } else if (changesBits(op)) {
+      maps.push_back(k);
+    }
+  }
+  std::vector<std::pair<BV, std::pair<int, int>>> order(uses.begin(), uses.end());
+  std::sort(order.begin(), order.end(), [](const std::pair<BV, std::pair<int, int>>& x, const std::pair<BV, std::pair<int, int>>& y) {
+    return x.second.first != y.second.first ? x.second.first > y.second.first : x.second.second < y.second.second; });
+  Span S; S.L = g_L;
+  for (auto& e : order) {
+    BV t = e.first;
+    if (S.reduce(t) && S.dim() + 1 <= n2 - need) S.add(e.first);
+  }
+  *conserved = 0; *total = 0;
+  for (auto& e : order) { BV t = e.first; *total += e.second.first; if (!S.reduce(t)) *conserved += e.second.first; }
+  return S.annihilator();
 }
 
 // Finds the window that starts at b and the rows that survive it.
@@ -372,16 +410,33 @@ static Window planWindow(int b, int gWanted, const std::vector<uint64_t>& sample
     }
     if (mx < bestMax) { bestMax = mx; w.rows = rows; }
   }
+  w.predShare = (w.g && ns) ? bestMax / (double)ns : -1;
   if (o.policySeed >= 0) matchedRng.seed(policyStreamSeed(o.policySeed, b, 0x100000000ULL));
   if (!ann.empty()) for (int i = 0; i < 32; i++) w.spare.push_back(randomRow());
   if (o.fixedRows && g_fixed.empty() && w.g > 0) {
     // The rows for the rest of the run: as many as the largest bucket count, the best-balanced set on this sample.
-    const int G = std::min(o.gmax, (int)ann.size());
+    // --fixed-rows 1 draws them from the rows of this window, --fixed-rows 2 from the rows that the most rotations of the
+    // whole circuit conserve (oracleRows).
+    std::vector<BV> from;
+    if (o.fixedRows == 2) {
+      int kept = 0, total = 0;
+      from = oracleRows(b, o.gmax, &kept, &total);
+      if (g_rank == 0) printf("fixed rows from the whole circuit: %d of %d branching rotations conserve the row space of %zu rows\n",
+                              kept, total, from.size());
+    }
+    auto rowOf = [&](const std::vector<BV>& basis) {
+      BV r(W, 0);
+      bool any = false;
+      while (!any)
+        for (auto& a : basis) if (rowRng() & 1ULL) { any = true; for (int x = 0; x < W; x++) r[x] ^= a[x]; }
+      return r;
+    };
+    const int G = std::min(o.gmax, (int)(o.fixedRows == 2 ? from.size() : ann.size()));
     std::vector<uint64_t> best;
     double bestMx = 1e300;
     for (int c = 0; c < std::max(1, o.cands); c++) {
       std::vector<uint64_t> rows((size_t)G * W, 0);
-      for (int j = 0; j < G; j++) { BV r = randomRow(); std::copy(r.begin(), r.end(), rows.begin() + (size_t)j * W); }
+      for (int j = 0; j < G; j++) { BV r = o.fixedRows == 2 ? rowOf(from) : randomRow(); std::copy(r.begin(), r.end(), rows.begin() + (size_t)j * W); }
       std::vector<long> h((size_t)1 << G, 0);
       for (size_t i = 0; i < ns; i++) h[ownerCpu(&sample[i * W], rows, G)]++;
       const double mx = ns ? (double)*std::max_element(h.begin(), h.end()) : 0;
@@ -391,6 +446,8 @@ static Window planWindow(int b, int gWanted, const std::vector<uint64_t>& sample
     for (int j = 0; j < w.g; j++) std::copy(g_fixed[j].begin(), g_fixed[j].end(), w.rows.begin() + (size_t)j * W);
     if (g_rank == 0) printf("fixed rows: %d chosen at operation %d (largest of %d buckets on the sample: %.3f of the mean)\n",
                             G, b, 1 << G, ns ? bestMx * (double)(1 << G) / (double)ns : 0.0);
+    // Rows of the whole circuit need not be conserved by this window: it ends at the first rotation that changes one.
+    if (o.fixedRows == 2) { Window f = planFixed(b, gWanted, o, rng); f.predShare = ns ? bestMx / (double)ns : -1; return f; }
   }
   return w;
 }
@@ -1271,8 +1328,9 @@ static Problem buildProblem(const Opts& o) {
   if (c == "xxz")      return makeXXZ("XXZ Trotter, square lattice", o.lx * o.ly, squareLattice(o.lx, o.ly), o.steps, o.jxy, o.jz, o.obsQ < 0 ? (o.ly / 2) * o.lx + o.lx / 2 : o.obsQ, o.truncEvery);
   if (c == "qaoa")     return makeQaoa(o.n > 0 ? o.n : 100, o.layers, o.seed, o.truncEvery);
   if (c == "hea")      return makeHea(o.n > 0 ? o.n : 100, o.layers, o.seed, o.amp, o.obsQ < 0 ? (o.n > 0 ? o.n : 100) / 2 : o.obsQ, o.truncEvery);
+  if (c == "rpauli")   return makeRandomPauli(o.n > 0 ? o.n : 100, o.layers, o.locality, o.seed, o.amp, o.obsQ < 0 ? (o.n > 0 ? o.n : 100) / 2 : o.obsQ, o.truncEvery);
   if (c == "ki_noisy") return makeIsing("noisy kicked Ising, Eagle heavy-hex", NUM_CIRCUIT_QUBITS, heavyHexEagle(), o.steps, o.theta, -0.5, o.noise > 0 ? o.noise : 0.005, o.obsQ < 0 ? 62 : o.obsQ, o.truncEvery);
-  fprintf(stderr, "unknown circuit %s (ki, ki_lab, tfim_hh, tfim_sq, xxz, qaoa, hea, ki_noisy)\n", c.c_str());
+  fprintf(stderr, "unknown circuit %s (ki, ki_lab, tfim_hh, tfim_sq, xxz, qaoa, hea, ki_noisy, rpauli)\n", c.c_str());
   std::exit(1);
 }
 
@@ -1565,6 +1623,9 @@ int main(int argc, char** argv) {
     else if (a == "--long-window") o.longWindow = atof(next());
     else if (a == "--verify")      o.verify = atoi(next());
     else if (a == "--ckpt-window") o.ckptWindow = atoi(next());
+    else if (a == "--plan-only")   o.planOnly = atoi(next());
+    else if (a == "--dump-gens")   o.dumpGens = next();
+    else if (a == "--locality")    o.locality = atoi(next());
     else if (a == "--ckpt-file")   o.ckptFile = next();
     else if (a == "--stop-at-ckpt") o.stopAtCkpt = atoi(next());
     else if (a == "--resume")      o.resume = next();
@@ -1601,6 +1662,48 @@ int main(int argc, char** argv) {
     printf("circuit: %s; %d qubits; %zu gates -> %d operations on the data (%d branching rotations, %d Clifford, %d noise); "
            "%d Clifford gates deferred by the frame\n", P.name.c_str(), g_L.n, P.ops.size(), M, nBranch, nMap, nNoise, deferred);
   if (o.obsAll && g_rank == 0) printf("observable: sum of Z over the %d qubits (%zu terms)\n", g_L.n, P.observable.size());
+  if (o.planOnly || !o.dumpGens.empty()) {
+    if (g_rank == 0 && !o.dumpGens.empty()) {
+      // One line per branching rotation: its operation index and its generator at position 0 (hex words, x then z).
+      FILE* f = fopen(o.dumpGens.c_str(), "w");
+      if (!f) die("cannot open the generator file", __LINE__);
+      fprintf(f, "qubits %d words %d operations %d\n", g_L.n, words, M);
+      std::vector<int> maps;
+      for (int k = 0; k < M; k++) {
+        const Op& op = g_ops[k];
+        if (op.type == OP_ROT && op.branches) {
+          BV v = op.gen;
+          for (int j = (int)maps.size() - 1; j >= 0; --j) mapVec(g_ops[maps[j]], v.data(), g_L);
+          fprintf(f, "%d", k);
+          for (int x = 0; x < words; x++) fprintf(f, " %016llx", (unsigned long long)v[x]);
+          fprintf(f, "\n");
+        } else if (changesBits(op)) {
+          maps.push_back(k);
+        }
+      }
+      fclose(f);
+      printf("generators written to %s\n", o.dumpGens.c_str());
+    }
+    if (g_rank == 0 && o.planOnly) {
+      // The windows of a run without a sample (the window ends do not depend on the sample under --window ann).
+      std::mt19937_64 prng(o.seed);
+      std::vector<uint64_t> none;
+      int pos = 0, count = 0, longest = 0, minAnn = 2 * g_L.n;
+      while (pos < M) {
+        Window pw = planWindow(pos, 0, none, o, prng);
+        const int e = std::max(pos + 1, o.snap ? snapEnd(pw) : pw.e);
+        int rot = 0;
+        for (int k = pos; k < e; k++) rot += (g_ops[k].type == OP_ROT && g_ops[k].branches) ? 1 : 0;
+        if (o.trace) printf("plan window=%d ops=%d..%d branching_rotations=%d valid_rows=%d\n", count, pos, e, rot, pw.annDim);
+        longest = std::max(longest, e - pos); minAnn = std::min(minAnn, pw.annDim);
+        count++; pos = e;
+      }
+      printf("plan windows=%d operations=%d branching_rotations=%d longest=%d smallest_row_space=%d ann_min=%d\n",
+             count, M, nBranch, longest, minAnn, o.annMin < 0 ? g_L.n : o.annMin);
+    }
+    MPI_Finalize();
+    return 0;
+  }
   if (o.mode == "cupp") return runCuppDistributed(o, P);
 
   int nd = 0;
@@ -1925,8 +2028,8 @@ int main(int argc, char** argv) {
       int rot = 0;
       for (int k = w.b; k < w.e; k++) rot += (g_ops[k].type == OP_ROT && g_ops[k].branches) ? 1 : 0;
       if (g_rank == 0) {
-        printf("trace window=%d ops=%d..%d branching_rotations=%d generator_rank=%d valid_rows=%d rows=%d sectors=%ld largest_sector_in=%ld terms_in=%ld terms_out=%ld next_rows=%d splits_so_far=%ld sector_runs_so_far=%ld run=%.3f s\n",
-               wi, w.b, w.e, rot, 2 * g_L.n - w.annDim, w.annDim, w.g, trIn[0], trLargest, Nin, Nout, last ? -1 : nextW.g, sg[0], sg[1], lastRunMax);
+        printf("trace window=%d ops=%d..%d branching_rotations=%d generator_rank=%d valid_rows=%d rows=%d sectors=%ld largest_sector_in=%ld terms_in=%ld terms_out=%ld next_rows=%d splits_so_far=%ld sector_runs_so_far=%ld run=%.3f s pred_largest_share=%.5f\n",
+               wi, w.b, w.e, rot, 2 * g_L.n - w.annDim, w.annDim, w.g, trIn[0], trLargest, Nin, Nout, last ? -1 : nextW.g, sg[0], sg[1], lastRunMax, w.predShare);
         fflush(stdout);
       }
     }
