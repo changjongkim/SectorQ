@@ -12,9 +12,10 @@ fixed rows every such rotation ends a window (jobs/x_ablate.sh, --fixed-rows). P
   z-only       G random rows over the z bits
   first window G rows of the annihilator of the window in which --fixed-rows 1 chose its rows in the former ablation
                (the operation printed in logs/x/fx.<circuit>.g16.1e-4.out)
-  best fixed   --fixed-rows 2 (oracleRows of the engine): at the same operation b, rows conserved by the most later
-               rotations among those that still divide the terms at b (the terms at b differ only by the generators
-               before b, span A; a row orthogonal to A gives every term one label)
+  dividing     at the same operation b, rows conserved by the most later rotations among those that still divide the
+               terms at b (the terms at b differ only by the generators before b, span A; a row orthogonal to A gives
+               every term one label), without a balance condition: a lower bound on the breaks of useful fixed rows
+               under this greedy order. The engine's --fixed-rows 2 adds the balance of --fixed-rows 1 (pp_engine_k3).
 The row space conserved by every rotation of the circuit is listed too (whole-circuit rows): every term lies in the
 observable plus the span of all generators, so these rows give every term the same label.
 Random policies report the mean over the seeds. Balance needs the live terms and is measured by the engine runs.
@@ -133,7 +134,7 @@ def whole_circuit_rows(gens, n, nw):
 
 
 def best_fixed(gens, n, nw, g, b):
-    """The rows of oracleRows: generators before b span A; later generators enter S by decreasing use, one in S + A only
+    """Dividing rows conserved by the most later rotations (the rows of pp_engine_k2's oracleRows): generators before b span A; later generators enter S by decreasing use, one in S + A only
     while dim(S + A) - dim(S) > g + 4. Returns representatives of the annihilator of S modulo that of S + A."""
     S, SA = Span(), Span()
     for k, q in gens:
@@ -177,7 +178,7 @@ def main():
             if m:
                 chosen[c] = int(m.group(1))
     out = []
-    print(f"{'circuit':8s} {'rotations':>9s} {'windows':>7s} {'random':>7s} {'x-only':>7s} {'z-only':>7s} {'first':>7s} {'best':>7s} {'after b':>7s} {'whole-circuit rows':>18s}")
+    print(f"{'circuit':8s} {'rotations':>9s} {'windows':>7s} {'random':>7s} {'x-only':>7s} {'z-only':>7s} {'first':>7s} {'divid.':>7s} {'after b':>7s} {'whole-circuit rows':>18s}")
     for c in CIRC:
         n, nw, gens, windows = load(c)
         g = a.rows
@@ -203,12 +204,12 @@ def main():
             row["first window at"] = b
             reps = best_fixed(gens, n, nw, g, b)
             vals = [breaks([(k, q) for k, q in gens if k >= b], combos(reps, g, random.Random(s))) for s in range(a.seeds)]
-            row["best fixed"] = sum(vals) / len(vals)
+            row["dividing"] = sum(vals) / len(vals)
             row["rotations after b"] = sum(1 for k, _ in gens if k >= b)
         row["whole-circuit rows"] = whole_circuit_rows(gens, n, nw)
         out.append(row)
         f = lambda k: f"{row[k]:7.0f}" if k in row else f"{'-':>7s}"
-        print(f"{c:8s} {row['rotations']:9d} {row['windows']:7d} {f('random')} {f('x-only')} {f('z-only')} {f('first window')} {f('best fixed')} {f('rotations after b')} {row['whole-circuit rows']:18d}")
+        print(f"{c:8s} {row['rotations']:9d} {row['windows']:7d} {f('random')} {f('x-only')} {f('z-only')} {f('first window')} {f('dividing')} {f('rotations after b')} {row['whole-circuit rows']:18d}")
     json.dump(out, open(os.path.join(ROOT, "analysis", "fixed_row_policies.json"), "w"), indent=1)
 
 
