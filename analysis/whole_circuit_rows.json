@@ -1,0 +1,51 @@
+{
+ "ki": {
+  "qubits": 127,
+  "generators": 2540,
+  "whole_circuit_rows": 19,
+  "observable_terms": 1,
+  "distinct_labels_of_observable_terms": 1
+ },
+ "tfim": {
+  "qubits": 127,
+  "generators": 5420,
+  "whole_circuit_rows": 1,
+  "observable_terms": 1,
+  "distinct_labels_of_observable_terms": 1
+ },
+ "noise": {
+  "qubits": 127,
+  "generators": 2540,
+  "whole_circuit_rows": 19,
+  "observable_terms": 1,
+  "distinct_labels_of_observable_terms": 1
+ },
+ "tfimsq": {
+  "qubits": 121,
+  "generators": 3410,
+  "whole_circuit_rows": 1,
+  "observable_terms": 1,
+  "distinct_labels_of_observable_terms": 1
+ },
+ "xxz": {
+  "qubits": 64,
+  "generators": 2016,
+  "whole_circuit_rows": 2,
+  "observable_terms": 1,
+  "distinct_labels_of_observable_terms": 1
+ },
+ "qaoa": {
+  "qubits": 100,
+  "generators": 1000,
+  "whole_circuit_rows": 1,
+  "observable_terms": 150,
+  "distinct_labels_of_observable_terms": 1
+ },
+ "hea": {
+  "qubits": 100,
+  "generators": 3200,
+  "whole_circuit_rows": 0,
+  "observable_terms": 1,
+  "distinct_labels_of_observable_terms": 1
+ }
+}
