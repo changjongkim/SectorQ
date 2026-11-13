@@ -235,6 +235,28 @@ def ki_values():
         print(f"  {x:.0e}: {sorted(v)}")
 
 
+def accuracy_time():
+    """Figure ev_accuracy (30-qubit TFIM, 4 and 6 Trotter steps, exact reference): the error of the value at each cutoff
+    (the tick labels) and, per implementation, the lowest completed cutoff with its time (make_eval_figures.g_accuracy_time)."""
+    G = md.campaign()
+    impl = [("SectorQ 16 GPUs", "eng", "g16"), ("SectorQ 4 GPUs", "eng", "g4"), ("SectorQ 1 GPU", "eng", "g1"),
+            ("cuPauliProp 1 GPU", "ref", "g1"), ("SPD 1 GPU", "spd", "n1"), ("ORQA reproduction 4 nodes", "orqa", "n4"),
+            ("MonoProp 4 nodes", "monoprop", "n4"), ("PauliPropagation.jl 64 cores", "julia", "n1")]
+    print("accuracy-time (Figure ev_accuracy)")
+    for steps in (4, 6):
+        errs = []
+        for x in mf.ACC_CUTS:
+            vals = [G[i]["expectation"] for i in (f"acc.eng.s{steps}.{x}.g16", f"acc.eng.s{steps}.{x}.g4", f"acc.eng.s{steps}.{x}.g1") if mf.gok(G.get(i))]
+            if vals:
+                errs.append((x, abs(vals[0] - mf.EXACT_G[steps])))
+        print(f"  {steps} steps: error " + ", ".join(f"{x} {e:.1e}" for x, e in errs))
+        for name, tag, suffix in impl:
+            done = [(x, G[f"acc.{tag}.s{steps}.{x}.{suffix}"]["wall"]) for x in mf.ACC_CUTS if mf.gok(G.get(f"acc.{tag}.s{steps}.{x}.{suffix}"))]
+            if done:
+                x, w = done[-1]
+                print(f"    {name:30s} lowest {x} in {w:.2f} s; at 1e-5 " + (f"{dict(done)['1e-5']:.2f} s" if "1e-5" in dict(done) else "-"))
+
+
 if __name__ == "__main__":
     single()
     weak()
@@ -247,3 +269,4 @@ if __name__ == "__main__":
     weak_efficiency()
     cap256()
     ki_values()
+    accuracy_time()
