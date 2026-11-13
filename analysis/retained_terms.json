@@ -1,0 +1,278 @@
+[
+ {
+  "circuit": "ki",
+  "window": 10,
+  "cutoff": 3e-05,
+  "position": [
+   1398,
+   1398
+  ],
+  "terms": [
+   15102281,
+   15102281
+  ],
+  "duplicates": [
+   0,
+   0
+  ],
+  "shared": 15102281,
+  "only_one_gpu": 0,
+  "only_16_gpus": 0,
+  "max_abs_diff": 0.0,
+  "max_rel_diff": 0.0,
+  "unshared_over_cutoff": null
+ },
+ {
+  "circuit": "ki",
+  "window": 15,
+  "cutoff": 3e-05,
+  "position": [
+   2033,
+   2033
+  ],
+  "terms": [
+   10453767,
+   10453767
+  ],
+  "duplicates": [
+   0,
+   0
+  ],
+  "shared": 10453767,
+  "only_one_gpu": 0,
+  "only_16_gpus": 0,
+  "max_abs_diff": 0.0,
+  "max_rel_diff": 0.0,
+  "unshared_over_cutoff": null
+ },
+ {
+  "circuit": "ki",
+  "window": 5,
+  "cutoff": 3e-05,
+  "position": [
+   763,
+   763
+  ],
+  "terms": [
+   8626423,
+   8626423
+  ],
+  "duplicates": [
+   0,
+   0
+  ],
+  "shared": 8626423,
+  "only_one_gpu": 0,
+  "only_16_gpus": 0,
+  "max_abs_diff": 0.0,
+  "max_rel_diff": 0.0,
+  "unshared_over_cutoff": null
+ },
+ {
+  "circuit": "qaoa",
+  "window": 2,
+  "cutoff": 3e-05,
+  "position": [
+   350,
+   350
+  ],
+  "terms": [
+   25100,
+   25100
+  ],
+  "duplicates": [
+   0,
+   0
+  ],
+  "shared": 25100,
+  "only_one_gpu": 0,
+  "only_16_gpus": 0,
+  "max_abs_diff": 0.0,
+  "max_rel_diff": 0.0,
+  "unshared_over_cutoff": null
+ },
+ {
+  "circuit": "qaoa",
+  "window": 4,
+  "cutoff": 3e-05,
+  "position": [
+   600,
+   600
+  ],
+  "terms": [
+   5239596,
+   5239596
+  ],
+  "duplicates": [
+   0,
+   0
+  ],
+  "shared": 5239596,
+  "only_one_gpu": 0,
+  "only_16_gpus": 0,
+  "max_abs_diff": 0.0,
+  "max_rel_diff": 0.0,
+  "unshared_over_cutoff": null
+ },
+ {
+  "circuit": "qaoa",
+  "window": 6,
+  "cutoff": 3e-05,
+  "position": [
+   850,
+   850
+  ],
+  "terms": [
+   38748071,
+   38748071
+  ],
+  "duplicates": [
+   0,
+   0
+  ],
+  "shared": 38748071,
+  "only_one_gpu": 0,
+  "only_16_gpus": 0,
+  "max_abs_diff": 0.0,
+  "max_rel_diff": 0.0,
+  "unshared_over_cutoff": null
+ },
+ {
+  "circuit": "tfim",
+  "window": 10,
+  "cutoff": 3e-05,
+  "position": [
+   1350,
+   1350
+  ],
+  "terms": [
+   561565,
+   561565
+  ],
+  "duplicates": [
+   0,
+   0
+  ],
+  "shared": 561565,
+  "only_one_gpu": 0,
+  "only_16_gpus": 0,
+  "max_abs_diff": 0.0,
+  "max_rel_diff": 0.0,
+  "unshared_over_cutoff": null
+ },
+ {
+  "circuit": "tfim",
+  "window": 22,
+  "cutoff": 3e-05,
+  "position": [
+   2820,
+   2820
+  ],
+  "terms": [
+   17331962,
+   17331962
+  ],
+  "duplicates": [
+   0,
+   0
+  ],
+  "shared": 17331962,
+  "only_one_gpu": 0,
+  "only_16_gpus": 0,
+  "max_abs_diff": 0.0,
+  "max_rel_diff": 0.0,
+  "unshared_over_cutoff": null
+ },
+ {
+  "circuit": "tfim",
+  "window": 35,
+  "cutoff": 3e-05,
+  "position": [
+   4400,
+   4400
+  ],
+  "terms": [
+   3667820,
+   3667820
+  ],
+  "duplicates": [
+   0,
+   0
+  ],
+  "shared": 3667820,
+  "only_one_gpu": 0,
+  "only_16_gpus": 0,
+  "max_abs_diff": 0.0,
+  "max_rel_diff": 0.0,
+  "unshared_over_cutoff": null
+ },
+ {
+  "circuit": "xxz",
+  "window": 11,
+  "cutoff": 3e-05,
+  "position": [
+   1078,
+   1078
+  ],
+  "terms": [
+   32570205,
+   32570205
+  ],
+  "duplicates": [
+   0,
+   0
+  ],
+  "shared": 32570205,
+  "only_one_gpu": 0,
+  "only_16_gpus": 0,
+  "max_abs_diff": 0.0,
+  "max_rel_diff": 0.0,
+  "unshared_over_cutoff": null
+ },
+ {
+  "circuit": "xxz",
+  "window": 17,
+  "cutoff": 3e-05,
+  "position": [
+   1618,
+   1618
+  ],
+  "terms": [
+   5402358,
+   5402358
+  ],
+  "duplicates": [
+   0,
+   0
+  ],
+  "shared": 5402358,
+  "only_one_gpu": 0,
+  "only_16_gpus": 0,
+  "max_abs_diff": 0.0,
+  "max_rel_diff": 0.0,
+  "unshared_over_cutoff": null
+ },
+ {
+  "circuit": "xxz",
+  "window": 5,
+  "cutoff": 3e-05,
+  "position": [
+   538,
+   538
+  ],
+  "terms": [
+   6727091,
+   6727091
+  ],
+  "duplicates": [
+   0,
+   0
+  ],
+  "shared": 6727091,
+  "only_one_gpu": 0,
+  "only_16_gpus": 0,
+  "max_abs_diff": 0.0,
+  "max_rel_diff": 0.0,
+  "unshared_over_cutoff": null
+ }
+]

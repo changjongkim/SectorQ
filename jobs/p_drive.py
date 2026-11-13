@@ -91,7 +91,7 @@ LADDER128 = {"ki": BIG3, "tfim": BIG3, "noise": BIG3,
              "tfimsq": BIG3, "xxz": BIG3,
              "qaoa": ("1e-4", "3e-5", "1e-5", "5e-6", "3e-6", "2e-6", "1e-6", "5e-7", "3e-7", "2e-7", "1e-7", "7e-8", "5e-8"),
              "hea": ("1e-4", "3e-5", "1e-5", "5e-6", "3e-6", "2e-6", "1e-6", "5e-7", "3e-7", "2e-7", "1e-7", "7e-8", "5e-8", "3e-8")}
-LADDER256 = {"ki": BIG3[:9]}
+LADDER256 = {"ki": BIG3}           # 3e-7 and 2e-7 added 2026-11-12 (review: below its ok run at 5e-7)
 # weak scaling: the cutoffs of make_eval_figures.WEAK_S/WEAK_G and BIG_WEAK_S/BIG_WEAK (512 GPUs are not run)
 WEAK_MODE = {1: "g1", 2: "g2", 4: "g4", 8: "mg8", 16: "mg16", 32: "mg32", 64: "mg64", 128: "mg128", 256: "mg256"}
 WEAK = {"S": {1: "6.2e-5", 2: "4.3e-5", 4: "3e-5", 8: "2.1e-5", 16: "1.5e-5", 32: "1e-5", 64: "7.1e-6", 128: "4.9e-6", 256: "3.5e-6"},
