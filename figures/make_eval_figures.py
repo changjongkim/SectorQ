@@ -794,7 +794,7 @@ def count(n):
 # order single node -> weak scaling -> strong scaling -> other circuits -> scale-out.
 SQ = {"ours": ("#1f77b4", "o"), "cupp": ("#d62728", "^"), "defer": ("#8c564b", "s"), "orqa": ("#800080", "v"), "monoprop": ("#FFA500", "d"),
       "spd": ("#008000", "X"), "julia": ("#17becf", "P"), "ppvm": ("#7f7f7f", "h"), "qiskit": ("#e377c2", "*"), "prs": ("#6B8E23", "D")}
-SQ_NAME = {"ours": "SectorQ", "cupp": "cuPauliProp", "defer": "cuPauliProp, dedup deferred", "orqa": "ORQA (reproduction)", "monoprop": "MonoProp",
+SQ_NAME = {"ours": "SectorQ", "cupp": "cuPauliProp", "defer": "cuPauliProp, deferred dedup", "orqa": "ORQA reproduction", "monoprop": "MonoProp",
            "spd": "SPD", "julia": "PauliPropagation.jl", "ppvm": "ppvm", "qiskit": "Qiskit pauli-prop", "prs": "paulistrings-rs"}
 SHORT_WHY = {"oom": "out of memory", "tl": "over 40 min", "predicted_tl": "over 40 min"}
 STOPS = False     # True: a cross where an implementation stops; False: its line just ends at the last run that finished
@@ -911,8 +911,8 @@ def g_single_node(G, c="ki", title="Kicked Ising", ax=None):
         fig, ax = plt.subplots(figsize=(15.2, 5.6))
     lines = [("ours", "g4", "-", "SectorQ (4 GPUs)"), ("ours", "g1", "--", "SectorQ (1 GPU)"),
              ("cupp", "g4", "-", "cuPauliProp (4 GPUs)"), ("cupp", "g1", "--", "cuPauliProp (1 GPU)"),
-             ("defer", "g4", "-", "cuPauliProp, dedup deferred (4 GPUs)"), ("spd", "n1", "--", "SPD (1 GPU)"),
-             ("orqa", "n1", "-", "ORQA, reproduction (64 cores)"), ("monoprop", "n1", "-", "MonoProp (64 cores)"),
+             ("defer", "g4", "-", "cuPauliProp, deferred dedup (4 GPUs)"), ("spd", "n1", "--", "SPD (1 GPU)"),
+             ("orqa", "n1", "-", "ORQA reproduction (64 cores)"), ("monoprop", "n1", "-", "MonoProp (64 cores)"),
              ("julia", "n1", "-", "PauliPropagation.jl (64 cores)"), ("ppvm", "n1", "-", "ppvm (64 cores)"), ("qiskit", "n1", "-", "Qiskit pauli-prop (1 core)"),
              ("prs", "g4", "-", "paulistrings-rs (4 GPUs)"), ("prs", "g1", "--", "paulistrings-rs (1 GPU)")]
     rows, got = [], []
@@ -1172,8 +1172,8 @@ def g_breakdown(G, g=16):
 
 
 SIZE_PARTS = [("Gate Application (Library Calls)", "operations", OURS), ("Exchange Between Nodes", "exchange", "#C0432F"),
-              ("GPU-Host Copies", "copies", "#F5B553"), ("Re-sectoring", "partition", "#7FC8BE"),
-              ("Idle GPU", "idle", "#B9BDC4"), ("Waiting for Other Nodes", "waiting", "#8E96A3"), ("Other", "other", "#E3E4E8")]
+              ("GPU-Host Copies", "copies", "#F5B553"), ("Re-Sectoring", "partition", "#7FC8BE"),
+              ("Idle GPU", "idle", "#B9BDC4"), ("Synchronization", "waiting", "#8E96A3"), ("Other", "other", "#E3E4E8")]
 
 
 def g_breakdown_sizes(G, g=16, cutoffs=("1e-4", "3e-5", "1e-5", "3e-6", "1e-6"), axes=None, height=0.66):
@@ -1256,9 +1256,9 @@ def size_line(ax, G, ids, kind, label, ls="-"):
 
 
 SIZE_LINES = [("ours", "eng", "g16", "-", "SectorQ (16 GPUs)"), ("ours", "eng", "g4", "--", "SectorQ (4 GPUs)"), ("ours", "eng", "g1", ":", "SectorQ (1 GPU)"),
-              ("cupp", "cupp", "g16", "-", "cuPauliProp (16 GPUs)"), ("defer", "defer", "g16", "-", "cuPauliProp, dedup deferred (16 GPUs)"),
+              ("cupp", "cupp", "g16", "-", "cuPauliProp (16 GPUs)"), ("defer", "defer", "g16", "-", "cuPauliProp, deferred dedup (16 GPUs)"),
               ("cupp", "ref", "g1", ":", "cuPauliProp (1 GPU)"), ("spd", "spd", "n1", ":", "SPD (1 GPU)"),
-              ("orqa", "orqa", "n4", "-", "ORQA, reproduction (4 nodes)"), ("monoprop", "monoprop", "n4", "-", "MonoProp (4 nodes)"),
+              ("orqa", "orqa", "n4", "-", "ORQA reproduction (4 nodes)"), ("monoprop", "monoprop", "n4", "-", "MonoProp (4 nodes)"),
               ("julia", "julia", "n1", "-", "PauliPropagation.jl (64 cores)"), ("ppvm", "ppvm", "n1", "-", "ppvm (64 cores)")]
 
 
@@ -1324,7 +1324,7 @@ def g_accuracy_time(G, axes=None):
     if axes is None:
         fig, axes = plt.subplots(1, 2, figsize=(15.6, 5.4), sharey=True)
     lines = [("ours", "eng", "g16", "-", "SectorQ (16 GPUs)"), ("ours", "eng", "g4", "--", "SectorQ (4 GPUs)"), ("ours", "eng", "g1", ":", "SectorQ (1 GPU)"),
-             ("cupp", "ref", "g1", ":", "cuPauliProp (1 GPU)"), ("spd", "spd", "n1", ":", "SPD (1 GPU)"), ("orqa", "orqa", "n4", "-", "ORQA, reproduction (4 nodes)"),
+             ("cupp", "ref", "g1", ":", "cuPauliProp (1 GPU)"), ("spd", "spd", "n1", ":", "SPD (1 GPU)"), ("orqa", "orqa", "n4", "-", "ORQA reproduction (4 nodes)"),
              ("monoprop", "monoprop", "n4", "-", "MonoProp (4 nodes, own truncation)"), ("julia", "julia", "n1", "-", "PauliPropagation.jl (64 cores)")]
     for ax, steps in zip(axes, (4, 6)):
         for kind, tag, suffix, ls, label in lines:

@@ -378,11 +378,11 @@ def n11():
 # ---------------------------------------------------------------------------------------
 def n13():
     style = {16: ("-", "o"), 4: ("--", "s"), 1: (":", "^")}
-    panels = [("Target Terms per Sector", ["1.5M", "3M", "6M\n(Default)", "12M"],
+    panels = [("Target Sector Size", ["1.5M", "3M", "6M\n(Ours)", "12M"],
                {16: ["14.7", "12.9", "12.2", "11.7"], 4: ["51.1", "47.0", "46.7", "44.6"]}),
-              ("Sectors per GPU", ["1", "2\n(Default)", "4", "8"],
+              ("Sectors per GPU", ["1", "2\n(Ours)", "4", "8"],
                {16: ["12.3", "12.2", "12.6", "13.6"], 4: ["44.5", "46.7", "46.8", "46.7"]}),
-              ("GPU Memory Allowed (GB)", ["36\n(Default)", "18", "8", "4"],
+              ("GPU Memory Limit (GB)", ["36\n(Ours)", "18", "8", "4"],
                {1: ["168", "177", "219", "274"], 4: ["46.7", "45.7", "55.6", "71.1"]})]
     fig, axes = plt.subplots(1, 3, figsize=(W, H), sharey=True)
     for ax, (xlabel, ticks, series) in zip(axes, panels):
@@ -472,8 +472,8 @@ def d_single_node():
     # three columns that read row by row: the 4-GPU runs, the 1-GPU runs, then the implementations on the host
     # (13 entries in three columns of 5, 4 and 4: the GPU implementations, cuPauliProp's modes and MonoProp, the CPU ones)
     grid = [["SectorQ (4 GPUs)", "SectorQ (1 GPU)", "paulistrings-rs (4 GPUs)", "paulistrings-rs (1 GPU)", "SPD (1 GPU)"],
-            ["cuPauliProp (4 GPUs)", "cuPauliProp (1 GPU)", "cuPauliProp, dedup deferred (4 GPUs)", "MonoProp (64 cores)"],
-            ["ORQA, reproduction (64 cores)", "PauliPropagation.jl (64 cores)", "ppvm (64 cores)", "Qiskit pauli-prop (1 core)"]]
+            ["cuPauliProp (4 GPUs)", "cuPauliProp (1 GPU)", "cuPauliProp, deferred dedup (4 GPUs)", "MonoProp (64 cores)"],
+            ["ORQA reproduction (64 cores)", "PauliPropagation.jl (64 cores)", "ppvm (64 cores)", "Qiskit pauli-prop (1 core)"]]
     order = [n for column in grid for n in column if n in found]
     order += [n for n in found if n not in order]                    # the cross, and any line this list does not know
     top = strip(fig, [[(found[n], n) for n in order]], size=13, ncol=3)

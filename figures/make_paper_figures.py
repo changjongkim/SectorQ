@@ -507,18 +507,19 @@ def bg_accuracy():
 
 
 def bg_windows():
-    """(a) gates, gates at which 16 fixed parts move terms, and windows per circuit; (b) terms at the window starts."""
+    """(a) operations, gates at which 16 fixed parts move terms (count of fixed_rows.json), and windows per circuit;
+    (b) terms at the window starts. Operations include Pauli noise channels, which never move terms."""
     import json
     d = json.load(open(os.path.join(os.path.dirname(HERE), "analysis", "fixed_rows.json")))
     logs = {"Kicked Ising": (5420, 20), "TFIM heavy-hex": (5420, 45), "Noisy kicked Ising": (7960, 20), "TFIM 11x11": (3410, 24),
-            "XXZ 8x8": (2048, 23), "QAOA": (1100, 8), "Ansatz": (4784, 34)}           # gates and windows of the engine runs
+            "XXZ 8x8": (2048, 23), "QAOA": (1100, 8), "Ansatz": (4784, 34)}           # operations and windows of the engine runs
     names = list(logs)
-    short = ["KI", "TFIM\nHH", "Noisy\nKI", "TFIM\n2D", "XXZ", "QAOA", "Ansatz"]
+    short = ["KI", "TFIM\nHH", "Noisy\nKI", "TFIM\n11×11", "XXZ", "QAOA", "Ansatz"]
     fig, ax = plt.subplots()
     x = range(len(names))
     w = 0.27
-    series = (([logs[n][0] for n in names], "#9aa3ad", "Gates"),
-              ([d[n]["fixed_random"] * logs[n][0] / d[n]["gates"] for n in names], mf.SQ["cupp"][0], "Gates That Move Terms, Fixed Rows"),
+    series = (([logs[n][0] for n in names], "#9aa3ad", "Operations"),
+              ([d[n]["fixed_random"] for n in names], mf.SQ["cupp"][0], "Gates That Move Terms, Fixed Rows"),
               ([logs[n][1] for n in names], mf.SQ["ours"][0], "Windows of SectorQ"))
     for k, (vals, col, lab) in enumerate(series):
         ax.bar([i + (k - 1) * w for i in x], vals, width=w, color=col, label=lab, zorder=3)
@@ -622,7 +623,7 @@ def ev_breakdown():
         for i, (coef, share) in enumerate(samples):
             bottom = 0
             for label, key, color in mf.SIZE_PARTS:
-                label = "Idle Workers" if key == "idle" else label
+                label = "Worker Idle Time" if key == "idle" else label
                 value = 100 * share[key]
                 ax.bar(i, value, bottom=bottom, width=0.65, color=color, label=label if i == 0 else None)
                 bottom += value
@@ -759,7 +760,7 @@ def ev_large_time():
             assert values["other"] >= -0.01, r["id"]
             bottom = 0
             for label, key, color in mf.SIZE_PARTS:
-                label = "Idle Workers" if key == "idle" else label
+                label = "Worker Idle Time" if key == "idle" else label
                 ax.bar(i, values[key], bottom=bottom, width=0.65, color=color, label=label if i == 0 else None)
                 bottom += values[key]
         ax.set_xticks(range(3), ["128", "256", "512"])
@@ -791,7 +792,7 @@ def ev_runtime():
                 ticks.append(label)
                 bottom = 0
                 for label, key, color in mf.SIZE_PARTS:
-                    label = "Idle Workers" if key == "idle" else label
+                    label = "Worker Idle Time" if key == "idle" else label
                     share = 100 * r[key] / r["wall"]
                     ax.bar(i, share, width=0.6, bottom=bottom,
                            color=color, label=label if i == 0 else None)
@@ -832,8 +833,8 @@ def ev_resector():
                and r["gpus"] == 16 for r in rows)
     assert all(p["status"] == "complete" for p in pairs)
     runs = {(r["mode"], r["circuit"], r["cutoff"], r["repetition"]): r for r in rows}
-    cases = [("ki", "Kicked Ising"), ("tfim", "TFIM HH"), ("noise", "Noisy KI"),
-             ("tfimsq", r"TFIM $11\times11$"), ("xxz", r"XXZ $8\times8$"),
+    cases = [("ki", "KI"), ("tfim", "TFIM HH"), ("noise", "Noisy KI"),
+             ("tfimsq", "TFIM 11×11"), ("xxz", "XXZ"),
              ("qaoa", "QAOA"), ("hea", "Ansatz")]
     styles = [("1e-4", r"$10^{-4}$", "#0072B2", "o"),
               ("3e-5", r"$3\times10^{-5}$", "#E69F00", "s"),
@@ -867,9 +868,9 @@ def ev_resector():
                             xerr=[[ratio - min(ratios)], [max(ratios) - ratio]],
                             fmt=marker, color=color, markersize=7, capsize=2.5,
                             elinewidth=1, markeredgewidth=0.5)
-    settings = [((0.94, 1.76), [1.0, 1.2, 1.4, 1.6], "Imbalance ratio (1 / 8)"),
-                ((0.62, 1.10), [0.7, 0.8, 0.9, 1.0, 1.1], "Time ratio (1 / 8)"),
-                ((0.97, 1.53), [1.0, 1.2, 1.4], "Time ratio (off / on)")]
+    settings = [((0.94, 1.76), [1.0, 1.2, 1.4, 1.6], "Imbalance Ratio (1 / 8)"),
+                ((0.62, 1.10), [0.7, 0.8, 0.9, 1.0, 1.1], "Time Ratio (1 / 8)"),
+                ((0.97, 1.53), [1.0, 1.2, 1.4], "Time Ratio (Off / On)")]
     for k, (ax, (limits, ticks, xlabel)) in enumerate(zip(axes, settings)):
         labels = cases if k < 2 else cases[:3]
         ax.set_yticks(range(len(labels)), [label for _, label in labels])
@@ -969,9 +970,9 @@ def ev_sectorcount():
     of each workload (16-256, chosen after the runs); the whiskers span the five blocks."""
     data = json.load(open(os.path.join(os.path.dirname(HERE), "analysis", "paper_n2count_summary.json")))
     names = {"ki": "KI", "tfim": "TFIM\nHH", "noise": "Noisy\nKI", "tfimsq": "TFIM\n11×11", "xxz": "XXZ", "qaoa": "QAOA", "hea": "Ansatz"}
-    series = (("adaptive", "Adaptive count (SectorQ)", mf.SQ["ours"][0], "o", -0.22),
-              ("fixed16", "16 fixed sectors", "#7f7f7f", "s", 0.0),
-              ("best", "Fastest fixed count of each workload", "#2ca02c", "D", 0.22))
+    series = (("adaptive", "Adaptive Count (SectorQ)", mf.SQ["ours"][0], "o", -0.22),
+              ("fixed16", "16 Fixed Sectors", "#7f7f7f", "s", 0.0),
+              ("best", "Fastest Fixed Count of Each Workload", "#2ca02c", "D", 0.22))
     fig, axes = plt.subplots(1, 3)
     for ax, x in zip(axes, ("1e-4", "1e-5", "3e-6")):
         ws = {w["circuit"]: w for w in data["workloads"] if w["cutoff"] == x}
