@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Read only completed ablation logs at logs/x's top level (exclude archived runs)."""
+"""Fixed-row ablation of Figure 15 and Table 5 (fixed against recomputed rows on 16 GPUs).
+
+Since 2026-11-12 the runs are the re-measurement with the current engine (bin/pp_engine_k3, jobs/y_items.py E1,
+logs/y/e1.<mode>.<circuit>.<cutoff>.out): re = recomputed rows, fx = fixed rows of the first partitioned window,
+bf = rotation-aware fixed rows (--fixed-rows 2, Section 4.10). The former runs of logs/x (pp_engine_x, 4 and 16 GPUs)
+are no longer read.
+"""
 import csv
 import json
 import re
@@ -45,11 +51,12 @@ def parse_log(path):
 
 def main():
     rows = []
-    for path in sorted((ROOT / 'logs/x').glob('*.out')):
-        match = re.fullmatch(r'(re|fx)\.(\w+)\.g(4|16)\.([\de.-]+)\.out', path.name)
+    for path in sorted((ROOT / 'logs/y').glob('e1.*.out')):
+        match = re.fullmatch(r'e1\.(re|fx|bf)\.(\w+)\.([\de.-]+)\.out', path.name)
         if not match:
             continue
-        mode, circuit, gpus, cutoff = match.groups()
+        mode, circuit, cutoff = match.groups()
+        gpus = 16
         row = parse_log(path)
         # Preserve the source path and summary counters without duplicating all
         # per-window logs in the checked-in table. parse_log retains traces for
@@ -64,14 +71,24 @@ def main():
         writer = csv.DictWriter(f, fieldnames=fields, extrasaction='ignore', lineterminator='\n')
         writer.writeheader()
         writer.writerows(rows)
-    for g in (16, 4):
+    for fixed in ('fx', 'bf'):
+        every = []
         for c in ('ki', 'tfim', 'tfimsq', 'xxz', 'qaoa', 'hea'):
-            runs = {(r['mode'], r['cutoff']): r for r in rows if r['gpus'] == g and r['circuit'] == c}
-            pairs = [(r, runs.get(('fx', x))) for (m, x), r in runs.items() if m == 're']
+            runs = {(r['mode'], r['cutoff']): r for r in rows if r['circuit'] == c}
+            pairs = [(r, runs.get((fixed, x))) for (m, x), r in runs.items() if m == 're']
+            failed = [(c, a['cutoff']) for a, b in pairs if b and a['exit'] == 0 and b['exit'] != 0]
             pairs = [(a, b) for a, b in pairs if b and a['exit'] == b['exit'] == 0]
             ratios = [b['wall'] / a['wall'] for a, b in pairs]
+            every += ratios
             errors = [abs(a['expectation'] - b['expectation']) for a, b in pairs]
-            print(g, c, 'pairs', len(pairs), 'speedup', round(min(ratios), 2), round(max(ratios), 2), 'max answer diff', max(errors))
+            print(16, fixed, c, 'pairs', len(pairs), 'speedup', round(min(ratios), 2), round(max(ratios), 2), 'max answer diff', max(errors),
+                  'fixed failed', failed)
+        print(16, fixed, 'all', 'pairs', len(every), 'speedup', round(min(every), 1), round(max(every), 1))
+    print('Table 5 (cutoff 1e-5): circuit, windows re fx, traffic GB re fx')
+    for c in ('ki', 'tfim', 'tfimsq', 'xxz', 'qaoa', 'hea'):
+        a = next(r for r in rows if r['circuit'] == c and r['mode'] == 're' and r['cutoff'] == '1e-5')
+        b = next(r for r in rows if r['circuit'] == c and r['mode'] == 'fx' and r['cutoff'] == '1e-5')
+        print(f"{c:7s} {a['windows']:>5,d} {b['windows']:>6,d} {a['sent_gb']:8.1f} {b['sent_gb']:8.1f}   re wall {a['wall']:.2f} s")
 
 if __name__ == '__main__':
     main()
